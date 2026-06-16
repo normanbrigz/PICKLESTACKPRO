@@ -1,0 +1,2712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PickleStack Pro — Open Play Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #0B0F1A;
+  --bg2: #111827;
+  --bg3: #1C2333;
+  --bg4: #242D42;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #F0F4FF;
+  --text2: #8B96B0;
+  --text3: #5A6478;
+  --accent: #3B82F6;
+  --accent2: #1D4ED8;
+  --green: #10B981;
+  --green2: #065F46;
+  --amber: #F59E0B;
+  --amber2: #78350F;
+  --red: #EF4444;
+  --red2: #7F1D1D;
+  --purple: #8B5CF6;
+  --purple2: #3B0764;
+  --teal: #14B8A6;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --font: 'Inter', system-ui, sans-serif;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{height:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:14px}
+
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-columns:240px 1fr;grid-template-rows:64px 1fr;min-height:100vh}
+.topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:20px 0;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.main{background:var(--bg);overflow-y:auto;padding:24px}
+
+/* ── TOPBAR ── */
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--text)}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo span{color:var(--accent)}
+.topbar-center{display:flex;align-items:center;gap:8px}
+.session-chip{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--text2)}
+.dot-live{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{opacity:.8;box-shadow:0 0 0 5px rgba(16,185,129,0)}}
+.timer-display{font-family:var(--font-display);font-size:15px;font-weight:600;color:var(--text);letter-spacing:.04em;min-width:70px;text-align:center}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:0 14px;height:36px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:var(--font)}
+.btn:hover{background:var(--bg4);border-color:var(--border2)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2);border-color:var(--accent2)}
+.btn-success{background:var(--green);border-color:var(--green);color:#fff}
+.btn-success:hover{background:#059669;border-color:#059669}
+.btn-danger{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:var(--red)}
+.btn-danger:hover{background:rgba(239,68,68,.25)}
+.btn-amber{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.3);color:var(--amber)}
+.btn-amber:hover{background:rgba(245,158,11,.25)}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--text2)}
+.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-sm{height:30px;padding:0 10px;font-size:11px}
+.btn-icon{width:36px;padding:0;justify-content:center}
+.btn-icon-sm{width:28px;height:28px;padding:0;justify-content:center;font-size:14px}
+
+/* ── SIDEBAR ── */
+.sidebar-section{padding:8px 12px 4px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;margin:0 8px;border-radius:var(--radius-sm);font-size:13px;color:var(--text2);cursor:pointer;transition:all .15s}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(59,130,246,.15);color:var(--accent);font-weight:500}
+.nav-item .nav-icon{width:18px;text-align:center;font-size:15px}
+.nav-item .nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
+.sidebar-bottom{margin-top:auto;padding:16px}
+.court-count-bar{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px}
+.ccb-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.ccb-dots{display:flex;gap:5px}
+.ccb-dot{width:12px;height:12px;border-radius:3px;transition:all .3s}
+.ccb-dot.on{background:var(--green)}
+.ccb-dot.off{background:var(--bg4);border:1px solid var(--border2)}
+
+/* ── STATS ROW ── */
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.blue::before{background:var(--accent)}
+.stat-card.green::before{background:var(--green)}
+.stat-card.amber::before{background:var(--amber)}
+.stat-card.purple::before{background:var(--purple)}
+.stat-card.teal::before{background:var(--teal)}
+.stat-icon{font-size:20px;margin-bottom:8px}
+.stat-val{font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--text);line-height:1}
+.stat-lbl{font-size:11px;color:var(--text2);margin-top:4px}
+.stat-trend{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ── PAGE GRID ── */
+.page-grid{display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start}
+.page-grid-3{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+
+/* ── PANEL ── */
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
+.panel-title{font-family:var(--font-display);font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.panel-title .pt-icon{font-size:14px;color:var(--text2)}
+.panel-body{padding:16px 18px}
+.panel-body-tight{padding:0}
+
+/* ── COURTS ── */
+.court-card{border-bottom:1px solid var(--border);padding:14px 18px;transition:background .15s}
+.court-card:last-child{border-bottom:none}
+.court-card:hover{background:rgba(255,255,255,.02)}
+.court-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.court-name{font-family:var(--font-display);font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.court-actions{display:flex;gap:6px;align-items:center}
+.status-pill{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:.03em;text-transform:uppercase}
+.sp-playing{background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.25)}
+.sp-ready{background:rgba(59,130,246,.15);color:#60A5FA;border:1px solid rgba(59,130,246,.25)}
+.sp-empty{background:rgba(255,255,255,.05);color:var(--text3);border:1px solid var(--border)}
+.court-teams{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.team{display:flex;flex-direction:column;gap:6px}
+.team-a .player-pill{border-color:rgba(59,130,246,.35);background:rgba(59,130,246,.08)}
+.team-b .player-pill{border-color:rgba(139,92,246,.35);background:rgba(139,92,246,.08)}
+.player-pill{display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg3);font-size:12px;color:var(--text);font-weight:500}
+.player-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.av-a{background:rgba(59,130,246,.2);color:#60A5FA}
+.av-b{background:rgba(139,92,246,.2);color:#A78BFA}
+.av-q{background:var(--bg4);color:var(--text3)}
+.vs-badge{font-size:11px;font-weight:700;color:var(--text3);text-align:center;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 8px}
+.skill-tag{font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px;margin-left:auto;flex-shrink:0}
+.sk-A{background:rgba(107,114,128,.15);color:#9CA3AF}
+.sk-B{background:rgba(16,185,129,.15);color:#6EE7B7}
+.sk-C{background:rgba(245,158,11,.15);color:#FCD34D}
+.sk-D{background:rgba(239,68,68,.15);color:#F87171}
+.court-timer{font-size:10px;color:var(--text3);font-variant-numeric:tabular-nums}
+.ct-bar{height:3px;border-radius:2px;background:var(--bg4);margin-top:10px;overflow:hidden}
+.ct-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:2px;transition:width 1s linear}
+.empty-court{display:flex;align-items:center;justify-content:center;padding:20px;color:var(--text3);font-size:12px;gap:8px;flex-direction:column;border:1.5px dashed var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all .15s}
+.empty-court:hover{border-color:var(--accent);color:var(--accent)}
+.fill-btn{font-size:11px;color:var(--accent)}
+
+/* ── QUEUE ── */
+.queue-add{display:flex;gap:8px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.queue-add input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:0 12px;height:36px;color:var(--text);font-size:13px;font-family:var(--font)}
+.queue-add input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(59,130,246,.15)}
+.queue-add input::placeholder{color:var(--text3)}
+.queue-list{max-height:480px;overflow-y:auto}
+.queue-list::-webkit-scrollbar{width:4px}
+.queue-list::-webkit-scrollbar-track{background:transparent}
+.queue-list::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+.queue-item{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--border);transition:background .1s;cursor:grab}
+.queue-item:last-child{border-bottom:none}
+.queue-item:hover{background:var(--bg3)}
+.queue-item.drag-over{background:rgba(59,130,246,.1);border-color:var(--accent)}
+.q-pos{font-size:10px;font-weight:700;color:var(--text3);min-width:16px;text-align:center;font-variant-numeric:tabular-nums}
+.q-win{background:rgba(16,185,129,.18);border-left:3px solid var(--green);}
+.q-lose{background:rgba(239,68,68,.10);border-left:3px solid rgba(239,68,68,.4);}
+.wl-badge{font-size:10px;font-weight:800;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wl-w{background:rgba(16,185,129,.25);color:#34D399;border:1px solid rgba(16,185,129,.4)}
+.wl-l{background:rgba(239,68,68,.2);color:#F87171;border:1px solid rgba(239,68,68,.35)}
+.court-drop-zone{border:2px dashed var(--border2);border-radius:var(--radius-sm);padding:10px 12px;text-align:center;font-size:12px;color:var(--text3);transition:all .15s;cursor:pointer;min-height:44px;display:flex;align-items:center;justify-content:center;gap:6px}
+.court-drop-zone:hover{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.05)}
+.court-drop-zone.drag-over-zone{border-color:var(--green)!important;color:var(--green)!important;background:rgba(16,185,129,.08)!important;transform:scale(1.01)}
+.court-slot{border:1.5px dashed var(--border2);border-radius:var(--radius-sm);padding:7px 10px;min-height:40px;transition:all .15s;display:flex;align-items:center}
+.court-slot.drag-over-zone{border-color:var(--green)!important;background:rgba(16,185,129,.08)!important}
+.court-slot.has-player{border-style:solid;border-color:var(--border)}
+.team-drop-col{display:flex;flex-direction:column;gap:6px;flex:1}
+.drop-slot-lbl{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.queue-item{user-select:none}
+.q-group-hdr{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:6px 18px 3px;color:var(--text3);display:flex;align-items:center;gap:6px}
+.q-group-hdr.win-hdr{color:#34D399}
+.q-group-hdr.lose-hdr{color:#F87171}
+.q-group-hdr.plain-hdr{color:var(--text3)}
+.q-av{width:30px;height:30px;border-radius:50%;background:rgba(59,130,246,.1);color:#60A5FA;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;border:1px solid rgba(59,130,246,.2)}
+.q-info{flex:1;min-width:0}
+.q-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-sub{font-size:10px;color:var(--text3);margin-top:1px}
+.q-actions{display:flex;align-items:center;gap:4px}
+.icon-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:all .12s}
+.icon-btn:hover{background:var(--bg4);color:var(--text)}
+.icon-btn.del:hover{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:var(--red)}
+.queue-empty{padding:32px 18px;text-align:center;color:var(--text3);font-size:12px}
+.queue-empty .qe-icon{font-size:32px;margin-bottom:8px;opacity:.4}
+
+/* ── HISTORY ── */
+.history-item{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--border)}
+.history-item:last-child{border-bottom:none}
+.hi-num{font-size:10px;color:var(--text3);min-width:20px;text-align:right;font-variant-numeric:tabular-nums}
+.hi-court{font-size:11px;font-weight:600;color:var(--accent);min-width:54px}
+.hi-teams{flex:1;font-size:12px;color:var(--text2)}
+.hi-teams span{color:var(--text)}
+.hi-time{font-size:10px;color:var(--text3);white-space:nowrap}
+
+/* ── LEADERBOARD ── */
+.lb-item{display:flex;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid var(--border)}
+.lb-item:last-child{border-bottom:none}
+.lb-rank{font-size:12px;font-weight:700;min-width:20px;text-align:center}
+.rank-1{color:#F59E0B}
+.rank-2{color:#94A3B8}
+.rank-3{color:#D97706}
+.rank-n{color:var(--text3)}
+.lb-av{width:28px;height:28px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--text2);flex-shrink:0}
+.lb-name{font-size:13px;font-weight:500;color:var(--text);flex:1}
+.lb-games{font-size:12px;color:var(--text2);min-width:50px;text-align:right}
+.lb-bar{height:3px;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--purple));margin-top:3px}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:24px;width:100%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.6)}
+.modal h3{font-family:var(--font-display);font-size:16px;font-weight:600;margin-bottom:18px;color:var(--text)}
+.form-field{margin-bottom:14px}
+.form-field label{font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.form-field input,.form-field select{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:0 12px;height:40px;color:var(--text);font-size:13px;font-family:var(--font)}
+.form-field input:focus,.form-field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(59,130,246,.15)}
+.form-field select option{background:var(--bg2)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.skill-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.skill-opt{border:1px solid var(--border2);border-radius:var(--radius-sm);padding:8px 6px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg3)}
+.skill-opt:hover,.skill-opt.selected{border-color:var(--accent);background:rgba(59,130,246,.1)}
+.skill-opt .so-lbl{font-size:14px;font-weight:700}
+.skill-opt .so-sub{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ── SCORE MODAL ── */
+.score-teams{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-bottom:16px}
+.score-team{text-align:center}
+.score-team-name{font-size:12px;color:var(--text2);margin-bottom:6px}
+.score-input{width:100%;text-align:center;font-family:var(--font-display);font-size:28px;font-weight:700;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:8px;color:var(--text)}
+.score-input:focus{outline:none;border-color:var(--accent)}
+.score-vs{font-size:14px;font-weight:700;color:var(--text3);text-align:center}
+
+/* ── TOAST ── */
+.toast-container{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:300}
+.toast{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 16px;font-size:13px;color:var(--text);min-width:200px;max-width:320px;box-shadow:var(--shadow);animation:slideIn .25s ease;display:flex;align-items:center;gap:8px}
+.toast.success{border-left:3px solid var(--green)}
+.toast.warning{border-left:3px solid var(--amber)}
+.toast.info{border-left:3px solid var(--accent)}
+.toast.error{border-left:3px solid var(--red)}
+@keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+
+/* ── MISC ── */
+.section-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.divider{height:1px;background:var(--border);margin:12px 0}
+.empty{text-align:center;padding:24px;color:var(--text3);font-size:12px}
+.tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px}
+.tag-new{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.2)}
+.page-title{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px}
+.page-sub{font-size:12px;color:var(--text2);margin-bottom:20px}
+.animate-in{animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.scroll-area{max-height:220px;overflow-y:auto}
+.scroll-area::-webkit-scrollbar{width:4px}
+.scroll-area::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+.highlight-bar{background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(139,92,246,.08));border:1px solid rgba(59,130,246,.15);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hb-text{font-size:12px;color:var(--text2)}
+.hb-text strong{color:var(--text);display:block;font-size:13px;font-weight:600}
+.rotation-hint{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:var(--radius-sm);padding:8px 12px;font-size:11px;color:#6EE7B7;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.heat-row{display:flex;align-items:center;gap:8px;padding:6px 18px;font-size:12px;border-bottom:1px solid var(--border)}
+.heat-row:last-child{border-bottom:none}
+.heat-name{flex:1;color:var(--text2)}
+.heat-val{color:var(--text);font-weight:500;font-variant-numeric:tabular-nums;min-width:24px;text-align:right}
+.heat-bar-wrap{width:80px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.heat-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--purple))}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="logo" style="align-items:center;padding:0">
+      <svg width="260" height="52" viewBox="0 0 680 148" role="img" style="display:block;flex-shrink:0;overflow:visible">
+        <title>PickleStackPro</title>
+        <defs>
+          <style>@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@800&display=swap');</style>
+          <clipPath id="hclip">
+            <ellipse cx="0" cy="-14" rx="34" ry="44"/>
+          </clipPath>
+        </defs>
+        <!-- Paddle icon -->
+        <g transform="translate(52,74)">
+          <g transform="rotate(-8)">
+            <!-- Grip bands -->
+            <rect x="-9" y="34"  width="18" height="6" rx="1.5" fill="#0f172a"/>
+            <rect x="-9" y="42"  width="18" height="6" rx="1.5" fill="#22c55e"/>
+            <rect x="-9" y="50"  width="18" height="6" rx="1.5" fill="#0f172a"/>
+            <rect x="-9" y="58"  width="18" height="6" rx="1.5" fill="#22c55e"/>
+            <rect x="-9" y="66"  width="18" height="6" rx="1.5" fill="#0f172a"/>
+            <rect x="-10" y="72" width="20" height="6" rx="3"   fill="#15803d"/>
+            <!-- Throat -->
+            <path d="M -9 24 Q -9 32 -9 34 L 9 34 Q 9 32 9 24 Z" fill="#166534"/>
+            <!-- Head -->
+            <ellipse cx="0" cy="-14" rx="34" ry="44" fill="#16a34a"/>
+            <!-- Edge guard -->
+            <ellipse cx="0" cy="-14" rx="34" ry="44" fill="none" stroke="#f0fdf4" stroke-width="3.5"/>
+            <!-- Face -->
+            <ellipse cx="0" cy="-14" rx="30" ry="40" fill="#15803d"/>
+            <!-- Brand stripe -->
+            <rect x="-30" y="-32" width="60" height="12" rx="0" clip-path="url(#hclip)" fill="#22c55e"/>
+
+            <!-- Center line -->
+            <line x1="-29" y1="-14" x2="29" y2="-14" stroke="#22c55e" stroke-width="1.5" opacity="0.45"/>
+          </g>
+          <!-- Ball -->
+          <g transform="translate(30,-52)">
+            <circle cx="0" cy="0" r="10" fill="#facc15"/>
+            <path d="M -10 0 Q -5 -6 0 0 Q 5 6 10 0"  fill="none" stroke="#a16207" stroke-width="1.1" stroke-linecap="round"/>
+            <path d="M 0 -10 Q 6 -5 0 0 Q -6 5 0 10"  fill="none" stroke="#a16207" stroke-width="1.1" stroke-linecap="round"/>
+            <circle cx="-3" cy="-3" r="1.5" fill="#a16207" opacity="0.5"/>
+            <circle cx="3"  cy="3"  r="1.5" fill="#a16207" opacity="0.5"/>
+          </g>
+        </g>
+        <!-- Wordmark single line -->
+        <text y="88" font-family="'Space Grotesk',system-ui,sans-serif" font-size="42" font-weight="800" letter-spacing="-1.5">
+          <tspan x="98" fill="white">PICKLE</tspan><tspan fill="#22c55e">STACK</tspan><tspan fill="#64748b">PRO</tspan>
+        </text>
+        <!-- Divider -->
+        <rect x="98" y="100" width="274" height="1" rx="0.5" fill="#22c55e" opacity="0.4"/>
+        <!-- By line -->
+        <text x="99" y="116" font-family="'Space Grotesk',system-ui,sans-serif" font-size="10" font-weight="600" fill="#22c55e" letter-spacing="2">BY: NORMAN BRIGZ</text>
+      </svg>
+    </div>
+    <div class="topbar-center" style="display:flex;align-items:center;gap:12px">
+      <div class="session-chip">
+        <span class="dot-live"></span>
+        <span id="session-date-top">Loading…</span>
+      </div>
+      <div class="timer-display" id="timer-top">00:00:00</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost btn-sm" id="pause-btn" onclick="togglePause()">⏸ Pause</button>
+      <button class="btn btn-sm btn-amber" onclick="confirmReset()">↺ New Session</button>
+      <button class="btn btn-sm btn-primary" onclick="exportAll()">⬇ Export Report</button>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div style="padding:0 8px;margin-bottom:8px" id="facilitator-block">
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Facilitator</div>
+          <button onclick="toggleFacilitatorEdit()" id="fac-edit-btn" style="font-size:9px;padding:2px 7px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer">✎ Edit</button>
+        </div>
+        <div id="fac-view">
+          <div style="font-size:13px;font-weight:600;color:#22C55E" id="fac-name-display">Norman Brigz</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:1px" id="fac-role-display">Open Play Host</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px" id="fac-venue-display"></div>
+        </div>
+        <div id="fac-edit" style="display:none;margin-top:6px">
+          <input id="fac-name-inp" type="text" placeholder="Facilitator name" value="Norman Brigz"
+            style="width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:5px 8px;color:var(--text);font-size:12px;font-family:var(--font);margin-bottom:5px"/>
+          <input id="fac-role-inp" type="text" placeholder="Role (e.g. Open Play Host)" value="Open Play Host"
+            style="width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:5px 8px;color:var(--text);font-size:12px;font-family:var(--font);margin-bottom:5px"/>
+          <input id="fac-venue-inp" type="text" placeholder="Venue / Location (optional)"
+            style="width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:5px 8px;color:var(--text);font-size:12px;font-family:var(--font);margin-bottom:6px"/>
+          <button onclick="saveFacilitator()" style="width:100%;height:28px;border-radius:6px;border:none;background:#22C55E;color:#fff;font-size:11px;font-weight:600;cursor:pointer">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">Navigation</div>
+    <div class="nav-item active" onclick="setPage('dashboard')"><span class="nav-icon">⚡</span> Dashboard <span class="nav-badge" id="nav-queue-badge">0</span></div>
+    <div class="nav-item" onclick="setPage('courts')"><span class="nav-icon">🏟</span> Courts</div>
+    <div class="nav-item" onclick="setPage('players')"><span class="nav-icon">👥</span> All Players</div>
+    <div class="nav-item" onclick="setPage('roster')"><span class="nav-icon">📒</span> Player Roster</div>
+    <div class="nav-item" onclick="setPage('history')"><span class="nav-icon">📋</span> Match History</div>
+    <div class="nav-item" onclick="setPage('stats')"><span class="nav-icon">📊</span> Statistics</div>
+
+    <div class="sidebar-section" style="margin-top:12px">Quick Actions</div>
+    <div class="nav-item" onclick="openAddPlayerModal()"><span class="nav-icon">➕</span> Add Player</div>
+    <div class="nav-item" onclick="rotateAll()"><span class="nav-icon">🔄</span> Rotate All Courts</div>
+    <div class="nav-item" onclick="addCourt()"><span class="nav-icon">🏓</span> Add Court</div>
+    <div class="nav-item" onclick="shuffleQueue()"><span class="nav-icon">🎲</span> Shuffle Queue</div>
+
+    <div class="sidebar-bottom">
+      <div class="court-count-bar">
+        <div class="ccb-label">Courts Active</div>
+        <div class="ccb-dots" id="sidebar-court-dots"></div>
+        <div style="font-size:10px;color:var(--text2);margin-top:6px"><span id="sidebar-active-count">0</span> / <span id="sidebar-total-count">3</span> playing</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main" id="main-content">
+    <!-- content rendered by JS -->
+  </main>
+</div>
+
+<!-- ADD PLAYER MODAL -->
+<div class="modal-overlay" id="modal-add">
+  <div class="modal animate-in">
+    <h3>➕ Add Player to Queue</h3>
+    <div class="form-field">
+      <label>Full Name</label>
+      <input type="text" id="ap-name" placeholder="e.g. Norman Brigz" onkeydown="if(event.key==='Enter')confirmAddPlayer()"/>
+    </div>
+    <div class="form-field">
+      <label>Skill Level</label>
+      <div class="skill-grid" id="skill-grid">
+        <div class="skill-opt selected" data-skill="A" onclick="selectSkill(this,'A')"><div class="so-lbl sk-A">A</div><div class="so-sub">Beginner</div></div>
+        <div class="skill-opt" data-skill="B" onclick="selectSkill(this,'B')"><div class="so-lbl sk-B">B</div><div class="so-sub">Beginner+</div></div>
+        <div class="skill-opt" data-skill="C" onclick="selectSkill(this,'C')"><div class="so-lbl sk-C">C</div><div class="so-sub">Intermediate</div></div>
+        <div class="skill-opt" data-skill="D" onclick="selectSkill(this,'D')"><div class="so-lbl sk-D">D</div><div class="so-sub">Advanced</div></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModals()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmAddPlayer()">Add to Queue</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCORE MODAL -->
+<div class="modal-overlay" id="modal-score">
+  <div class="modal animate-in" style="max-width:700px;width:96vw">
+    <h3>🏁 Record Match Score</h3>
+    <div id="score-modal-body"></div>
+
+    <!-- NEXT MATCH PREVIEW (shown after score entered) -->
+    <div id="next-match-preview" style="margin-top:16px;display:none">
+      <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)">⚡ Next Match Preview</div>
+      <div style="display:grid;grid-template-columns:1fr 48px 1fr;gap:10px;align-items:start">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:#60A5FA;letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px;padding-left:2px">🔵 TEAM A</div>
+          <div style="display:flex;flex-direction:column;gap:6px" id="preview-team-a"></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;padding-top:30px">
+          <div style="font-size:13px;font-weight:800;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 8px;text-align:center">VS</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:#A78BFA;letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px;padding-left:2px">🟣 TEAM B</div>
+          <div style="display:flex;flex-direction:column;gap:6px" id="preview-team-b"></div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-top:8px;padding:6px 10px;background:var(--bg3);border-radius:6px;border:1px solid var(--border)">
+        💡 Use Queue to replace a player · Use ⇆ Team to swap positions between Team A and Team B
+      </div>
+    </div>
+
+    <div id="next-match-empty" style="margin-top:10px;font-size:11px;color:var(--text3);display:none">
+      Not enough players in queue to preview next match.
+    </div>
+
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="btn" onclick="closeModals()">Cancel</button>
+      <button class="btn btn-success" id="next-match-btn" onclick="confirmScore()">Next Match</button>
+    </div>
+  </div>
+</div>
+
+<!-- SWAP PLAYER MODAL -->
+<div class="modal-overlay" id="modal-swap">
+  <div class="modal animate-in" style="max-width:460px;width:100%">
+    <h3>🔄 Swap Player</h3>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px" id="swap-label">Choose a replacement</div>
+    <div id="swap-list" style="display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto"></div>
+    <div class="modal-actions" style="margin-top:14px">
+      <button class="btn" onclick="closeSwapModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- MANUAL ASSIGN MODAL -->
+<div class="modal-overlay" id="modal-assign">
+  <div class="modal animate-in" style="max-width:480px">
+    <h3>🎯 Assign Players to Court</h3>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:16px" id="assign-court-label">Assigning to court</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <!-- Slot 0 -->
+      <div style="background:var(--bg3);border:1.5px solid rgba(59,130,246,.25);border-radius:var(--radius-sm);padding:10px 12px">
+        <div style="font-size:10px;font-weight:700;color:#60A5FA;letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px">🔵 Team A · Slot 1</div>
+        <select id="slot-sel-0" onchange="onSlotSelectChange()" style="width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:0 8px;height:36px;color:var(--text);font-size:12px;font-family:var(--font)"></select>
+        <div id="slot-current-0" style="font-size:10px;color:var(--text3);margin-top:5px"></div>
+      </div>
+      <!-- Slot 1 -->
+      <div style="background:var(--bg3);border:1.5px solid rgba(59,130,246,.25);border-radius:var(--radius-sm);padding:10px 12px">
+        <div style="font-size:10px;font-weight:700;color:#60A5FA;letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px">🔵 Team A · Slot 2</div>
+        <select id="slot-sel-1" onchange="onSlotSelectChange()" style="width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:0 8px;height:36px;color:var(--text);font-size:12px;font-family:var(--font)"></select>
+        <div id="slot-current-1" style="font-size:10px;color:var(--text3);margin-top:5px"></div>
+      </div>
+      <!-- Slot 2 -->
+      <div style="background:var(--bg3);border:1.5px solid rgba(139,92,246,.25);border-radius:var(--radius-sm);padding:10px 12px">
+        <div style="font-size:10px;font-weight:700;color:#A78BFA;letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px">🟣 Team B · Slot 1</div>
+        <select id="slot-sel-2" onchange="onSlotSelectChange()" style="width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:0 8px;height:36px;color:var(--text);font-size:12px;font-family:var(--font)"></select>
+        <div id="slot-current-2" style="font-size:10px;color:var(--text3);margin-top:5px"></div>
+      </div>
+      <!-- Slot 3 -->
+      <div style="background:var(--bg3);border:1.5px solid rgba(139,92,246,.25);border-radius:var(--radius-sm);padding:10px 12px">
+        <div style="font-size:10px;font-weight:700;color:#A78BFA;letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px">🟣 Team B · Slot 2</div>
+        <select id="slot-sel-3" onchange="onSlotSelectChange()" style="width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:0 8px;height:36px;color:var(--text);font-size:12px;font-family:var(--font)"></select>
+        <div id="slot-current-3" style="font-size:10px;color:var(--text3);margin-top:5px"></div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;font-size:11px;color:var(--text3);margin-bottom:14px">
+      💡 Occupied slots will move the existing player back to queue automatically.
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModals()">Cancel</button>
+      <button class="btn btn-primary" id="assign-confirm-btn" onclick="confirmManualAssign()">Assign Players</button>
+    </div>
+  </div>
+</div>
+
+<!-- COURT ACTION MODAL -->
+<div class="modal-overlay" id="modal-court">
+  <div class="modal animate-in">
+    <h3 id="court-modal-title">Court Options</h3>
+    <div id="court-modal-body"></div>
+    <div class="modal-actions" id="court-modal-actions"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ────────────────────────────────────────────────────────────────────────────
+// STATE
+// ────────────────────────────────────────────────────────────────────────────
+const S = {
+  courts: [
+    {id:1,name:'Court 1',players:[],status:'empty',timer:0,scores:{a:0,b:0},category:'beginner'},
+    {id:2,name:'Court 2',players:[],status:'empty',timer:0,scores:{a:0,b:0},category:'beginner'},
+    {id:3,name:'Court 3',players:[],status:'empty',timer:0,scores:{a:0,b:0},category:'beginner'},
+  ],
+  // Dual queue system
+  queues: {
+    beginner: [],      // category A & B players
+    advanced: [],      // category C & D players
+  },
+  roster: {},   // all players ever seen {name: playerObj}
+  history: [],  // match records
+  gamesPlayed: 0,
+  paused: false,
+  sessionStart: Date.now(),
+  timerSec: 0,
+  courtTimers: {},  // courtId -> seconds elapsed
+  nextCourtId: 4,
+  nextPlayerId: 1,
+  currentPage: 'dashboard',
+  selectedSkill: 'A',
+  pendingScoreCourtId: null,
+  finishOrder: 0,   // increments each time a court finishes
+  dragSrcIdx: null,
+};
+
+// ────────────────────────────────────────────────────────────────────────────
+// UTILITIES
+// ────────────────────────────────────────────────────────────────────────────
+const av = n => (n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const fmtTime = s => `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor((s%3600)/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+const fmtMini = s => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+const now12 = () => new Date().toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'});
+
+function toast(msg, type='info'){
+  const c = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = msg;
+  c.appendChild(el);
+  setTimeout(()=>el.remove(), 3000);
+}
+
+function closeModals(){
+  document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open'));
+}
+
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)closeModals();});
+});
+
+function selectSkill(el, skill){
+  document.querySelectorAll('.skill-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  S.selectedSkill = skill;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// SESSION TIMER
+// ────────────────────────────────────────────────────────────────────────────
+setInterval(()=>{
+  if(S.paused) return;
+  S.timerSec++;
+  document.getElementById('timer-top').textContent = fmtTime(S.timerSec);
+  S.courts.forEach(c=>{
+    if(c.status==='playing'){
+      S.courtTimers[c.id] = (S.courtTimers[c.id]||0)+1;
+    }
+  });
+  // update court timer bars live
+  S.courts.forEach(c=>{
+    const el = document.getElementById(`ct-fill-${c.id}`);
+    const lbl = document.getElementById(`ct-lbl-${c.id}`);
+    if(el){
+      const t = S.courtTimers[c.id]||0;
+      const pct = Math.min(100, (t/900)*100); // 15 min = full
+      el.style.width = pct+'%';
+    }
+    if(lbl) lbl.textContent = fmtMini(S.courtTimers[c.id]||0);
+  });
+},1000);
+
+// ────────────────────────────────────────────────────────────────────────────
+// DUAL QUEUE HELPERS
+// ────────────────────────────────────────────────────────────────────────────
+function getQueue(category){
+  // 'beginner' or 'advanced'
+  return S.queues[category] || S.queues.beginner;
+}
+function getPlayerCategory(skill){
+  // A,B = beginner  |  C,D = advanced
+  return (skill==='C'||skill==='D') ? 'advanced' : 'beginner';
+}
+function getCourtCategory(court){
+  return court.category || 'beginner';
+}
+function setCategoryOnCourt(courtId, category){
+  const court = S.courts.find(c=>c.id===courtId);
+  if(!court) return;
+  // Move current players to correct new queue
+  if(court.players.length>0){
+    const cat = category;
+    S.queues[cat].unshift(...court.players);
+    court.players=[];
+    court.status='empty';
+    S.courtTimers[courtId]=0;
+  }
+  court.category = category;
+  render();
+  toast(`${court.name} set to ${category==='advanced'?'⚡ Intermediate/Advanced':'🌱 Beginner'}`,'info');
+}
+
+// Push player(s) into the right priority queue
+function pushToQueue(players, category){
+  const q = getQueue(category);
+  // Already tagged W/L players — insert in priority order
+  players.forEach(p=>q.push(p));
+  sortQueue(q);
+}
+function sortQueue(q){
+  // ── INTERNATIONAL OPEN PLAY FAIR ROTATION ──
+  // Priority 1: Never-played players (gamesPlayed===0), sorted by addedAt (FIFO)
+  // Priority 2: W (winners), sorted by finishOrder asc
+  // Priority 3: L (losers), sorted by finishOrder asc
+  // Special rule: if only 1-2 unplayed remain, they are kept at top but
+  //   fillCourt() will pair them with winners — handled in buildNextMatchLineup()
+  q.sort((a,b)=>{
+    const neverA = (a.gamesPlayed||0)===0 && !a.matchResult;
+    const neverB = (b.gamesPlayed||0)===0 && !b.matchResult;
+    if(neverA && neverB) return (a.addedAt||0)-(b.addedAt||0); // FIFO among unplayed
+    if(neverA) return -1; // unplayed always first
+    if(neverB) return  1;
+    // Both have played — W before L, then by finishOrder
+    const rankA = a.matchResult==='W'?0:a.matchResult==='L'?1:2;
+    const rankB = b.matchResult==='W'?0:b.matchResult==='L'?1:2;
+    if(rankA!==rankB) return rankA-rankB;
+    return (a.finishOrder||9999)-(b.finishOrder||9999);
+  });
+}
+
+// Count never-played in a queue
+function countUnplayed(q){ return q.filter(p=>(p.gamesPlayed||0)===0&&!p.matchResult).length; }
+
+// Replace old S.queue references for compatibility
+function legacyQueueGet(){return S.queues.beginner;}
+
+// Ensure S.queue always mirrors S.queues.beginner for legacy compat
+try {
+  Object.defineProperty(S,'queue',{
+    get(){ return S.queues.beginner; },
+    set(v){ S.queues.beginner=v; },
+    configurable: true
+  });
+} catch(e) { console.warn('queue alias already defined'); }
+
+// ────────────────────────────────────────────────────────────────────────────
+// FACILITATOR PROFILE (editable, localStorage-persisted)
+// ────────────────────────────────────────────────────────────────────────────
+const FAC_KEY = 'psp_facilitator';
+const ROSTER_KEY = 'psp_alltime_roster';
+
+function loadFacilitator(){
+  try {
+    const saved = localStorage.getItem(FAC_KEY);
+    if(saved){
+      const f = JSON.parse(saved);
+      document.getElementById('fac-name-inp').value = f.name||'Norman Brigz';
+      document.getElementById('fac-role-inp').value = f.role||'Open Play Host';
+      document.getElementById('fac-venue-inp').value = f.venue||'';
+      document.getElementById('fac-name-display').textContent = f.name||'Norman Brigz';
+      document.getElementById('fac-role-display').textContent = f.role||'Open Play Host';
+      document.getElementById('fac-venue-display').textContent = f.venue||'';
+    }
+  } catch(e){}
+}
+
+function saveFacilitator(){
+  const name = document.getElementById('fac-name-inp').value.trim()||'Facilitator';
+  const role = document.getElementById('fac-role-inp').value.trim()||'Open Play Host';
+  const venue = document.getElementById('fac-venue-inp').value.trim();
+  document.getElementById('fac-name-display').textContent = name;
+  document.getElementById('fac-role-display').textContent = role;
+  document.getElementById('fac-venue-display').textContent = venue;
+  try{ localStorage.setItem(FAC_KEY, JSON.stringify({name,role,venue})); }catch(e){}
+  toggleFacilitatorEdit();
+  toast(`✅ Profile saved — ${name}`,'success');
+}
+
+function toggleFacilitatorEdit(){
+  const editDiv = document.getElementById('fac-edit');
+  const viewDiv = document.getElementById('fac-view');
+  const btn = document.getElementById('fac-edit-btn');
+  const isEditing = editDiv.style.display==='none'||editDiv.style.display==='';
+  editDiv.style.display = isEditing?'block':'none';
+  viewDiv.style.display = isEditing?'none':'block';
+  btn.textContent = isEditing?'✕ Cancel':'✎ Edit';
+  if(isEditing) document.getElementById('fac-name-inp').focus();
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// ALL-TIME PLAYER ROSTER (localStorage — survives sessions)
+// ────────────────────────────────────────────────────────────────────────────
+let allTimeRoster = {};  // {name: {name, skill, gamesPlayed, wins, lastSeen}}
+
+function loadAllTimeRoster(){
+  try{
+    const saved = localStorage.getItem(ROSTER_KEY);
+    if(saved) allTimeRoster = JSON.parse(saved);
+  }catch(e){ allTimeRoster={}; }
+}
+
+function saveAllTimeRoster(){
+  try{ localStorage.setItem(ROSTER_KEY, JSON.stringify(allTimeRoster)); }catch(e){}
+}
+
+function mergePlayerToAllTime(player){
+  const key = player.name.toLowerCase().trim();
+  if(!allTimeRoster[key]){
+    allTimeRoster[key] = {name:player.name, skill:player.skill, gamesPlayed:player.gamesPlayed||0, wins:player.wins||0, lastSeen:new Date().toISOString()};
+  } else {
+    allTimeRoster[key].skill = player.skill;
+    allTimeRoster[key].gamesPlayed = (allTimeRoster[key].gamesPlayed||0)+(player.gamesPlayed||0);
+    allTimeRoster[key].wins = (allTimeRoster[key].wins||0)+(player.wins||0);
+    allTimeRoster[key].lastSeen = new Date().toISOString();
+  }
+  saveAllTimeRoster();
+}
+
+function searchAllTimeRoster(query){
+  if(!query||query.length<2) return [];
+  const q = query.toLowerCase();
+  return Object.values(allTimeRoster)
+    .filter(p=>p.name.toLowerCase().includes(q))
+    .sort((a,b)=>(b.gamesPlayed||0)-(a.gamesPlayed||0))
+    .slice(0,8);
+}
+
+// ── AUTOCOMPLETE ENGINE ──
+// Supports: 2-letter trigger, arrow key navigation, Enter to add & clear, Escape to dismiss
+let acTarget = null;    // {inputEl, cat}
+let acSelected = -1;    // currently highlighted index
+let acResults  = [];    // current result set
+
+function attachAutocomplete(inputEl, cat){
+  inputEl.setAttribute('autocomplete','off');
+  inputEl.addEventListener('input', ()=>{ acSelected=-1; showAcDropdown(inputEl,cat); });
+  inputEl.addEventListener('keydown', e=>handleAcKey(e, inputEl, cat));
+}
+
+function handleAcKey(e, inputEl, cat){
+  const drop = document.getElementById('ac-dropdown');
+  if(!drop){
+    // No dropdown open — Enter triggers quickAdd on the quick-add inputs
+    if(e.key==='Enter' && inputEl !== document.getElementById('ap-name')){
+      e.preventDefault();
+      // Directly add the typed name to queue then clear
+      const name = inputEl.value.trim();
+      if(name){
+        quickAddToQueue(cat||'beginner', inputEl);
+        inputEl.value='';
+        acSelected=-1; acResults=[];
+      }
+    }
+    return;
+  }
+  const items = drop.querySelectorAll('.ac-item');
+  if(e.key==='ArrowDown'){
+    e.preventDefault();
+    acSelected = Math.min(acSelected+1, items.length-1);
+    highlightAcItem(items);
+  } else if(e.key==='ArrowUp'){
+    e.preventDefault();
+    acSelected = Math.max(acSelected-1, -1);
+    highlightAcItem(items);
+  } else if(e.key==='Enter'){
+    e.preventDefault();
+    if(acSelected>=0 && acResults[acSelected]){
+      const p = acResults[acSelected];
+      commitAcSelection(p.name, p.skill, inputEl, cat);
+    } else if(inputEl.value.trim()){
+      // No item highlighted — add whatever is typed
+      const name = inputEl.value.trim();
+      const skill = cat==='advanced'?'C':'A';
+      commitAcSelection(name, skill, inputEl, cat, true);
+    }
+  } else if(e.key==='Escape'){
+    hideAcDropdown();
+  }
+}
+
+function highlightAcItem(items){
+  items.forEach((el,i)=>{
+    el.style.background = i===acSelected?'rgba(59,130,246,.18)':'';
+    if(i===acSelected) el.scrollIntoView({block:'nearest'});
+  });
+}
+
+function showAcDropdown(inputEl, cat){
+  hideAcDropdown();
+  const val = inputEl.value.trim();
+  if(val.length<2){ acResults=[]; return; }
+  acResults = searchAllTimeRoster(val);
+  if(acResults.length===0) return;
+
+  acTarget = {inputEl, cat};
+  const rect = inputEl.getBoundingClientRect();
+  const drop = document.createElement('div');
+  drop.id = 'ac-dropdown';
+  drop.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.bottom+3}px;width:${Math.max(rect.width,260)}px;background:#1C2333;border:1px solid rgba(255,255,255,.14);border-radius:10px;z-index:9999;box-shadow:0 12px 40px rgba(0,0,0,.6);overflow:hidden;max-height:260px;overflow-y:auto`;
+
+  // Header hint
+  drop.innerHTML = `<div style="padding:6px 12px 4px;font-size:9px;font-weight:700;color:#475569;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.06)">↑↓ Navigate · Enter to add · Esc to dismiss</div>`;
+
+  const skillBg  = s=>s==='D'?'rgba(239,68,68,.15)':s==='C'?'rgba(245,158,11,.15)':s==='B'?'rgba(16,185,129,.15)':'rgba(107,114,128,.15)';
+  const skillClr = s=>s==='D'?'#F87171':s==='C'?'#FCD34D':s==='B'?'#6EE7B7':'#9CA3AF';
+
+  acResults.forEach((p,i)=>{
+    const row = document.createElement('div');
+    row.className='ac-item';
+    row.dataset.idx=i;
+    row.style.cssText='display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);transition:background .08s';
+    row.innerHTML=`
+      <div style="width:28px;height:28px;border-radius:50%;background:rgba(59,130,246,.12);color:#60A5FA;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${p.name.slice(0,2).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:#F0F4FF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
+        <div style="font-size:10px;color:#5A6478;margin-top:1px">${p.gamesPlayed||0} games · ${p.lastSeen?new Date(p.lastSeen).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}):'New'}</div>
+      </div>
+      <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px;background:${skillBg(p.skill)};color:${skillClr(p.skill)};flex-shrink:0">${p.skill}</span>
+      <span style="font-size:9px;color:#334155;flex-shrink:0">⏎</span>`;
+    row.addEventListener('mouseenter',()=>{ acSelected=i; highlightAcItem(drop.querySelectorAll('.ac-item')); });
+    row.addEventListener('click',()=>commitAcSelection(p.name,p.skill,inputEl,cat));
+    drop.appendChild(row);
+  });
+
+  document.body.appendChild(drop);
+}
+
+function commitAcSelection(name, skill, inputEl, cat, isNew=false){
+  hideAcDropdown();
+  // Determine which queue based on context
+  const targetCat = cat || addModalTargetCat || getPlayerCategory(skill);
+
+  if(inputEl === document.getElementById('ap-name')){
+    // Modal input — just fill name and pre-select skill, don't add yet
+    inputEl.value = name;
+    selectSkillByValue(skill);
+    inputEl.focus();
+    return;
+  }
+
+  // Quick-add input: add to queue immediately then clear for next entry
+  const id = 'p'+S.nextPlayerId++;
+  const player = {id, name, skill, gamesPlayed:0, wins:0, addedAt:Date.now()};
+  getQueue(targetCat).push(player);
+  if(!S.roster[name]) S.roster[name]={...player};
+  mergePlayerToAllTime(player);
+  saveSessionQueues();
+
+  // Flash green on the input, then clear for next player
+  inputEl.style.borderColor='#22c55e';
+  inputEl.style.background='rgba(34,197,94,.08)';
+  setTimeout(()=>{
+    inputEl.style.borderColor='';
+    inputEl.style.background = targetCat==='advanced'?'rgba(139,92,246,.06)':'rgba(16,185,129,.06)';
+  },400);
+
+  inputEl.value='';
+  acSelected=-1; acResults=[];
+  render();
+  toast(`✅ ${name} → ${targetCat==='advanced'?'⚡ Adv/Int':'🌱 Beginner'} queue`,'success');
+  // Keep focus on input for rapid entry
+  setTimeout(()=>inputEl.focus(),20);
+}
+
+function hideAcDropdown(){
+  const el = document.getElementById('ac-dropdown');
+  if(el) el.remove();
+  acTarget=null; acSelected=-1;
+}
+
+document.addEventListener('click', e=>{
+  if(!e.target.closest('#ac-dropdown')&&!e.target.closest('#ap-name')&&!e.target.closest('#q-beg-input')&&!e.target.closest('#q-adv-input'))
+    hideAcDropdown();
+});
+
+// Merge current session players into all-time roster on game over
+function syncRosterToAllTime(){
+  Object.values(S.roster).forEach(p=>mergePlayerToAllTime(p));
+  saveAllTimeRoster();
+}
+
+// ── SESSION QUEUE PERSISTENCE ──
+const SESSION_QUEUE_KEY = 'psp_session_queue';
+
+function saveSessionQueues(){
+  try{
+    // Save queues with their current state (names, skill, gamesPlayed, W/L tags)
+    const data = {
+      beginner: S.queues.beginner.map(p=>({
+        id:p.id, name:p.name, skill:p.skill,
+        gamesPlayed:p.gamesPlayed||0, wins:p.wins||0,
+        matchResult:p.matchResult||null,
+        finishOrder:p.finishOrder||null,
+        addedAt:p.addedAt||Date.now()
+      })),
+      advanced: S.queues.advanced.map(p=>({
+        id:p.id, name:p.name, skill:p.skill,
+        gamesPlayed:p.gamesPlayed||0, wins:p.wins||0,
+        matchResult:p.matchResult||null,
+        finishOrder:p.finishOrder||null,
+        addedAt:p.addedAt||Date.now()
+      })),
+      savedAt: Date.now()
+    };
+    localStorage.setItem(SESSION_QUEUE_KEY, JSON.stringify(data));
+  } catch(e){ console.warn('saveSessionQueues error',e); }
+}
+
+function loadSessionQueues(){
+  try{
+    const raw = localStorage.getItem(SESSION_QUEUE_KEY);
+    if(!raw) return false;
+    const data = JSON.parse(raw);
+    // Only restore if saved within last 12 hours
+    if(Date.now()-data.savedAt > 12*60*60*1000){
+      localStorage.removeItem(SESSION_QUEUE_KEY);
+      return false;
+    }
+    const restore = (arr) => arr.map(p=>({
+      ...p,
+      matchResult: p.matchResult||null,
+      finishOrder: p.finishOrder||null,
+    }));
+    S.queues.beginner = restore(data.beginner||[]);
+    S.queues.advanced = restore(data.advanced||[]);
+    // Rebuild roster from restored players
+    [...S.queues.beginner,...S.queues.advanced].forEach(p=>{
+      if(!S.roster[p.name]) S.roster[p.name]={...p};
+    });
+    return S.queues.beginner.length + S.queues.advanced.length;
+  } catch(e){ console.warn('loadSessionQueues error',e); return false; }
+}
+
+function clearSessionQueues(){
+  try{ localStorage.removeItem(SESSION_QUEUE_KEY); }catch(e){}
+}
+
+function initDate(){
+  const d = new Date();
+  const str = d.toLocaleDateString('en-PH',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  document.getElementById('session-date-top').textContent = str;
+}
+
+function togglePause(){
+  S.paused = !S.paused;
+  const btn = document.getElementById('pause-btn');
+  btn.textContent = S.paused ? '▶ Resume' : '⏸ Pause';
+  toast(S.paused ? '⏸ Session paused' : '▶ Session resumed', S.paused?'warning':'success');
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// PLAYER MANAGEMENT
+// ────────────────────────────────────────────────────────────────────────────
+function confirmAddPlayer(){
+  const name = document.getElementById('ap-name').value.trim();
+  if(!name){toast('⚠ Enter a player name','warning');return;}
+  const skill = S.selectedSkill;
+  const id = 'p'+S.nextPlayerId++;
+  const player = {id, name, skill, gamesPlayed:0, wins:0, addedAt:Date.now()};
+  // Use forced category if modal was opened for specific queue, else derive from skill
+  const cat = addModalTargetCat || getPlayerCategory(skill);
+  // Override skill to match category if forced
+  if(addModalTargetCat==='beginner'&&(skill==='C'||skill==='D')) player.skill='B';
+  if(addModalTargetCat==='advanced'&&(skill==='A'||skill==='B')) player.skill='C';
+  getQueue(cat).push(player);
+  if(!S.roster[name]) S.roster[name] = {...player};
+  closeModals();
+  document.getElementById('ap-name').value = '';
+  addModalTargetCat=null;
+  saveSessionQueues();
+  render();
+  const catLabel = cat==='advanced'?'⚡ Adv/Int':'🌱 Beginner';
+  toast(`✅ ${name} added to ${catLabel} queue`, 'success');
+}
+
+function removeFromQueue(id){
+  let p = null;
+  ['beginner','advanced'].forEach(cat=>{
+    const idx = S.queues[cat].findIndex(x=>x.id===id);
+    if(idx!==-1){ p=S.queues[cat][idx]; S.queues[cat].splice(idx,1); }
+  });
+  saveSessionQueues();
+  render();
+  toast(`Removed ${p?.name||'player'} from queue`);
+}
+
+function shuffleQueue(){
+  ['beginner','advanced'].forEach(cat=>{
+    const q=S.queues[cat];
+    for(let i=q.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [q[i],q[j]]=[q[j],q[i]];
+    }
+  });
+  render();
+  toast('🎲 Both queues shuffled!', 'info');
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// COURT MANAGEMENT
+// ────────────────────────────────────────────────────────────────────────────
+function addCourt(){
+  const id = S.nextCourtId++;
+  const input = prompt('Enter court name or number:\n(e.g. "Court 6" or just "6")', `Court ${id}`);
+  if(input===null){S.nextCourtId--;return;}
+  const raw = input.trim() || `Court ${id}`;
+  const displayName = /^\d+$/.test(raw) ? `Court ${raw}` : raw;
+  S.courts.push({id,name:displayName,players:[],status:'empty',timer:0,scores:{a:0,b:0}});
+  render();
+  toast(`🏟 ${displayName} added`, 'success');
+}
+
+function startInlineRename(courtId){
+  const court = S.courts.find(c=>c.id===courtId);
+  if(!court) return;
+  const el = document.getElementById(`court-name-lbl-${courtId}`);
+  if(!el) return;
+  const cur = court.name;
+  el.outerHTML = `<input id="rename-inp-${courtId}" type="text" value="${cur}" style="background:var(--bg4);border:1px solid var(--accent);border-radius:6px;padding:2px 8px;color:var(--text);font-size:13px;font-weight:600;font-family:var(--font-display);width:130px;outline:none" onblur="commitRename(${courtId})" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')cancelRename(${courtId})" />`;
+  setTimeout(()=>{const i=document.getElementById(`rename-inp-${courtId}`);if(i){i.focus();i.select();}},20);
+}
+
+function commitRename(courtId){
+  const court = S.courts.find(c=>c.id===courtId);
+  if(!court) return;
+  const inp = document.getElementById(`rename-inp-${courtId}`);
+  if(!inp) return;
+  const raw = inp.value.trim();
+  if(!raw){render();return;}
+  court.name = /^\d+$/.test(raw) ? `Court ${raw}` : raw;
+  render();
+  toast(`✏️ Renamed to "${court.name}"`, 'success');
+}
+
+function cancelRename(courtId){
+  render();
+}
+
+function fillCourt(courtId){
+  const court = S.courts.find(c=>c.id===courtId);
+  if(!court) return;
+  const needed = 4 - court.players.length;
+  if(needed<=0){toast('Court is already full','warning');return;}
+  const cat = getCourtCategory(court);
+  const q = getQueue(cat);
+  if(q.length<needed){
+    const catLabel=cat==='advanced'?'Adv/Int':'Beginner';
+    toast(`Need ${needed} more player(s) in ${catLabel} queue — have ${q.length}`,'warning');return;
+  }
+  const taken = q.splice(0,needed);
+  taken.forEach(p=>{ delete p.matchResult; delete p.finishOrder; });
+  court.players.push(...taken);
+  court.status = court.players.length>=4?'ready':court.players.length>0?'ready':'empty';
+  render();
+  toast(`✅ ${taken.map(p=>p.name).join(', ')} → ${court.name}`, 'success');
+}
+
+// Stores the proposed next-match lineup (can be swapped before confirming)
+let nextMatchLineup = [];  // array of 4 player objects (slots 0-3)
+
+function openScoreModal(courtId){
+  const court = S.courts.find(c=>c.id===courtId);
+  if(!court||court.players.length<4){rotateCourt(courtId);return;}
+  S.pendingScoreCourtId = courtId;
+  const ta = court.players.slice(0,2).map(p=>p.name).join(' & ');
+  const tb = court.players.slice(2,4).map(p=>p.name).join(' & ');
+  document.getElementById('score-modal-body').innerHTML = `
+    <div style="margin-bottom:12px;font-size:12px;color:var(--text2)">Enter the final score for <strong style="color:var(--text)">${court.name}</strong></div>
+    <div class="score-teams">
+      <div class="score-team">
+        <div class="score-team-name" style="color:#60A5FA">🔵 ${ta}</div>
+        <input class="score-input" id="score-a" type="number" min="0" max="21" value="11" oninput="refreshNextMatchPreview()"/>
+      </div>
+      <div class="score-vs">VS</div>
+      <div class="score-team">
+        <div class="score-team-name" style="color:#A78BFA">🟣 ${tb}</div>
+        <input class="score-input" id="score-b" type="number" min="0" max="21" value="9" oninput="refreshNextMatchPreview()"/>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:4px">All players will be moved to queue. Prepare for the next match.</div>
+  `;
+
+  // Build initial next-match lineup preview
+  buildNextMatchLineup(court);
+  renderNextMatchPreview();
+  document.getElementById('modal-score').classList.add('open');
+}
+
+function buildNextMatchLineup(court){
+  const cat = getCourtCategory(court);
+  const q = getQueue(cat);
+
+  const unplayed = q.filter(p=>(p.gamesPlayed||0)===0&&!p.matchResult);
+  const winners  = q.filter(p=>p.matchResult==='W');
+  const losers   = q.filter(p=>p.matchResult==='L');
+  const played   = q.filter(p=>(p.gamesPlayed||0)>0&&!p.matchResult);
+
+  // Special case: exactly 1 or 2 unplayed players remain →
+  // pair them with the top winner(s) so they're not left out
+  if(unplayed.length>0 && unplayed.length<=2 && winners.length>=(4-unplayed.length)){
+    const fill = [...unplayed, ...winners.slice(0, 4-unplayed.length)];
+    nextMatchLineup = fill.map(p=>({...p}));
+    return;
+  }
+
+  // Normal path: top 4 from sorted queue (unplayed first, then W, then L)
+  const sorted = [...unplayed,...winners,...losers,...played];
+  nextMatchLineup = sorted.slice(0,4).map(p=>({...p}));
+}
+
+function refreshNextMatchPreview(){
+  renderNextMatchPreview();
+}
+
+function renderNextMatchPreview(){
+  const previewEl = document.getElementById('next-match-preview');
+  const emptyEl   = document.getElementById('next-match-empty');
+  if(!previewEl||!emptyEl) return;
+
+  if(nextMatchLineup.length<4){
+    previewEl.style.display='none';
+    emptyEl.style.display='block';
+    return;
+  }
+  previewEl.style.display='block';
+  emptyEl.style.display='none';
+
+  const renderPreviewChip = (p, idx) => {
+    const isA   = idx<2;
+    const color = isA?'#60A5FA':'#A78BFA';
+    const bg    = isA?'rgba(59,130,246,.08)':'rgba(139,92,246,.08)';
+    const border= isA?'rgba(59,130,246,.25)':'rgba(139,92,246,.25)';
+    const wlDot = p.matchResult==='W'
+      ?'<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;background:rgba(16,185,129,.2);color:#34D399;margin-left:3px">W</span>'
+      :p.matchResult==='L'
+      ?'<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;background:rgba(239,68,68,.15);color:#F87171;margin-left:3px">L</span>':'';
+
+    // Partner swap btn — swaps this player with their same-team partner
+    const partnerIdx = isA ? (idx===0?1:0) : (idx===2?3:2);
+    const partnerName = nextMatchLineup[partnerIdx]?.name||'?';
+
+    return `<div style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;border:1px solid ${border};background:${bg}">
+      <div style="width:24px;height:24px;border-radius:50%;background:${bg};border:1px solid ${border};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${color};flex-shrink:0">${av(p.name)}</div>
+      <span style="font-size:12px;font-weight:500;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</span>
+      <span style="font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px;background:rgba(255,255,255,.06);color:var(--text2)">${p.skill}</span>
+      ${wlDot}
+      <div style="display:flex;gap:3px;flex-shrink:0">
+        <button onclick="openSwapModal(${idx},'queue')" title="Replace with player from queue"
+          style="height:22px;padding:0 7px;border-radius:6px;border:1px solid rgba(59,130,246,.3);background:rgba(59,130,246,.1);color:#60A5FA;font-size:9px;font-weight:600;cursor:pointer;white-space:nowrap">
+          ↕ Queue
+        </button>
+
+        <button onclick="swapCrossTeam(${idx})" title="Swap with someone from the other team"
+          style="height:22px;padding:0 7px;border-radius:6px;border:1px solid rgba(139,92,246,.3);background:rgba(139,92,246,.08);color:#A78BFA;font-size:9px;font-weight:600;cursor:pointer;white-space:nowrap">
+          ⇆ Team
+        </button>
+      </div>
+    </div>`;
+  };
+
+  document.getElementById('preview-team-a').innerHTML =
+    [nextMatchLineup[0],nextMatchLineup[1]].map((p,i)=>renderPreviewChip(p,i)).join('');
+  document.getElementById('preview-team-b').innerHTML =
+    [nextMatchLineup[2],nextMatchLineup[3]].map((p,i)=>renderPreviewChip(p,i+2)).join('');
+}
+
+// ── SWAP ACTIONS ──
+let swapTargetSlot = null;
+let swapMode = 'queue'; // 'queue' | 'cross-team'
+
+// Swap this player with their same-team partner instantly
+function swapWithPartner(slotIdx){
+  const partnerIdx = slotIdx<2 ? (slotIdx===0?1:0) : (slotIdx===2?3:2);
+  const temp = nextMatchLineup[slotIdx];
+  nextMatchLineup[slotIdx] = nextMatchLineup[partnerIdx];
+  nextMatchLineup[partnerIdx] = temp;
+  renderNextMatchPreview();
+  toast(`⇄ Swapped ${nextMatchLineup[partnerIdx].name} ↔ ${nextMatchLineup[slotIdx].name}`,'info');
+}
+
+// Swap this player with someone from the opposite team
+function swapCrossTeam(slotIdx){
+  swapTargetSlot = slotIdx;
+  swapMode = 'cross-team';
+  const isA = slotIdx<2;
+  // Offer the two players on the OTHER team to swap with
+  const otherSlots = isA ? [2,3] : [0,1];
+  const label = ['Team A · Slot 1','Team A · Slot 2','Team B · Slot 1','Team B · Slot 2'];
+  const current = nextMatchLineup[slotIdx];
+
+  document.getElementById('swap-label').innerHTML =
+    `Swap <strong style="color:var(--text)">${current.name}</strong> with someone from ${isA?'Team B':'Team A'}`;
+
+  const list = document.getElementById('swap-list');
+  list.innerHTML = `
+    <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:8px 12px 4px">
+      ${isA?'🟣 Team B players':'🔵 Team A players'} — click to swap positions
+    </div>
+    ${otherSlots.map(oi=>{
+      const op = nextMatchLineup[oi];
+      const oColor = oi<2?'#60A5FA':'#A78BFA';
+      const oBg    = oi<2?'rgba(59,130,246,.08)':'rgba(139,92,246,.08)';
+      const oBorder= oi<2?'rgba(59,130,246,.25)':'rgba(139,92,246,.25)';
+      return `<div onclick="confirmCrossTeamSwap(${slotIdx},${oi})"
+        style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid ${oBorder};background:${oBg};cursor:pointer;margin:4px 12px;transition:all .12s"
+        onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+        <div style="width:30px;height:30px;border-radius:50%;background:${oBg};border:1px solid ${oBorder};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:${oColor}">${av(op.name)}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:var(--text)">${op.name}</div>
+          <div style="font-size:10px;color:var(--text3)">${label[oi]} · Skill ${op.skill}</div>
+        </div>
+        <span style="font-size:11px;color:var(--text3);font-weight:600">⇆ Swap</span>
+      </div>`;
+    }).join('')}
+    <div style="padding:6px 12px 4px;margin-top:4px;border-top:1px solid var(--border)">
+      <div style="font-size:10px;color:var(--text3);padding:4px 0">Or replace with a player from the queue:</div>
+      ${buildQueueSwapList(slotIdx)}
+    </div>`;
+
+  document.getElementById('modal-swap').classList.add('open');
+}
+
+function confirmCrossTeamSwap(slotA, slotB){
+  const temp = nextMatchLineup[slotA];
+  nextMatchLineup[slotA] = nextMatchLineup[slotB];
+  nextMatchLineup[slotB] = temp;
+  closeSwapModal();
+  renderNextMatchPreview();
+  toast(`⇆ ${nextMatchLineup[slotB].name} ↔ ${nextMatchLineup[slotA].name} swapped between teams`,'info');
+}
+
+// Open the queue-replacement modal
+function openSwapModal(slotIdx, mode='queue'){
+  swapTargetSlot = slotIdx;
+  swapMode = mode;
+  const label = ['Team A · Slot 1','Team A · Slot 2','Team B · Slot 1','Team B · Slot 2'];
+  const current = nextMatchLineup[slotIdx];
+
+  document.getElementById('swap-label').innerHTML =
+    `Replace <strong style="color:var(--text)">${current?.name||'?'}</strong> <span style="color:var(--text3);font-size:11px">(${label[slotIdx]})</span> with a player from the queue`;
+
+  const list = document.getElementById('swap-list');
+  list.innerHTML = buildQueueSwapList(slotIdx);
+  document.getElementById('modal-swap').classList.add('open');
+}
+
+function buildQueueSwapList(slotIdx){
+  const court = S.courts.find(c=>c.id===S.pendingScoreCourtId);
+  const cat = getCourtCategory(court||{});
+  const q = getQueue(cat);
+  const lineupIds = new Set(nextMatchLineup.map(p=>p.id));
+  const available = q.filter(p=>!lineupIds.has(p.id));
+
+  if(available.length===0){
+    return '<div style="padding:12px;text-align:center;font-size:12px;color:var(--text3)">No other players in queue.</div>';
+  }
+
+  return available.map((p,i)=>{
+    const wlColor  = p.matchResult==='W'?'#34D399':p.matchResult==='L'?'#F87171':'var(--text3)';
+    const wlBg     = p.matchResult==='W'?'rgba(16,185,129,.1)':p.matchResult==='L'?'rgba(239,68,68,.08)':'var(--bg3)';
+    const wlBorder = p.matchResult==='W'?'rgba(16,185,129,.3)':p.matchResult==='L'?'rgba(239,68,68,.2)':'var(--border)';
+    const wlBadge  = p.matchResult?`<span style="font-size:9px;font-weight:800;padding:2px 6px;border-radius:8px;background:${p.matchResult==='W'?'rgba(16,185,129,.2)':'rgba(239,68,68,.15)'};color:${wlColor}">${p.matchResult}</span>`:'';
+    return `<div onclick="confirmSwap('${p.id}')"
+      style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;border:1px solid ${wlBorder};background:${wlBg};cursor:pointer;transition:all .12s"
+      onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+      <span style="font-size:10px;font-weight:700;color:var(--text3);min-width:18px;text-align:center">${i+1}</span>
+      ${wlBadge}
+      <div style="width:28px;height:28px;border-radius:50%;background:rgba(59,130,246,.1);color:#60A5FA;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${av(p.name)}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500;color:var(--text)">${p.name}</div>
+        <div style="font-size:10px;color:var(--text3)">Skill ${p.skill} · ${p.gamesPlayed||0} games played</div>
+      </div>
+      <span style="font-size:10px;color:var(--text3)">→ Select</span>
+    </div>`;
+  }).join('');
+}
+
+function confirmSwap(playerId){
+  const court = S.courts.find(c=>c.id===S.pendingScoreCourtId);
+  const cat = getCourtCategory(court||{});
+  const q = getQueue(cat);
+  const newPlayer = q.find(p=>p.id===playerId);
+  if(!newPlayer||swapTargetSlot===null){closeSwapModal();return;}
+  const old = nextMatchLineup[swapTargetSlot];
+  nextMatchLineup[swapTargetSlot] = {...newPlayer};
+  closeSwapModal();
+  renderNextMatchPreview();
+  toast(`✅ ${old?.name||'?'} → replaced by ${newPlayer.name}`,'success');
+}
+
+function closeSwapModal(){
+  document.getElementById('modal-swap').classList.remove('open');
+  swapTargetSlot=null;
+  swapMode='queue';
+}
+
+function confirmScore(){
+  const courtId = S.pendingScoreCourtId;
+  const court = S.courts.find(c=>c.id===courtId);
+  if(!court) return;
+  const sa = parseInt(document.getElementById('score-a').value)||0;
+  const sb = parseInt(document.getElementById('score-b').value)||0;
+  court.scores = {a:sa,b:sb};
+
+  // Capture the confirmed next lineup BEFORE rotating (rotate will reshuffle queue)
+  const confirmedLineup = nextMatchLineup.length>=4 ? [...nextMatchLineup] : null;
+
+  closeModals();
+  nextMatchLineup = [];
+
+  // Rotate: sends current players to queue, re-sorts
+  rotateCourt(courtId, sa, sb);
+
+  // Now apply the pre-confirmed lineup (remove those players from queue)
+  if(confirmedLineup && confirmedLineup.length>=4){
+    const cat = getCourtCategory(court);
+    const q = getQueue(cat);
+    const finalPlayers = [];
+
+    confirmedLineup.forEach(preview=>{
+      // Find them in the freshly-updated queue
+      const idx = q.findIndex(p=>p.name===preview.name);
+      if(idx!==-1){
+        const p = q.splice(idx,1)[0];
+        delete p.matchResult; delete p.finishOrder;
+        finalPlayers.push(p);
+      }
+    });
+
+    if(finalPlayers.length>=2){
+      // Fill remaining slots from queue if short
+      while(finalPlayers.length<4 && q.length>0){
+        const p = q.splice(0,1)[0];
+        delete p.matchResult; delete p.finishOrder;
+        finalPlayers.push(p);
+      }
+      court.players = finalPlayers;
+      if(court.players.length>=4){
+        // Auto-start: Next Match always begins immediately
+        court.status = 'playing';
+        S.courtTimers[courtId] = 0;
+        toast(`🏓 ${court.name} — Match started! ${finalPlayers.slice(0,2).map(p=>p.name).join(' & ')} vs ${finalPlayers.slice(2,4).map(p=>p.name).join(' & ')}`, 'success');
+      } else {
+        court.status = court.players.length>0?'ready':'empty';
+        toast(`🏓 ${court.name} — ${court.players.length} player(s) assigned`, 'info');
+      }
+      saveSessionQueues();
+      render();
+      return;
+    }
+  }
+  // fallback: rotateCourt already rendered
+}
+
+function rotateCourt(courtId, scoreA, scoreB){
+  const court = S.courts.find(c=>c.id===courtId);
+  if(!court||court.players.length===0){toast('No players on this court','warning');return;}
+  S.gamesPlayed++;
+  const duration = S.courtTimers[courtId]||0;
+  const entry = {
+    num: S.gamesPlayed,
+    time: now12(),
+    court: court.name,
+    team_a: court.players.slice(0,2).map(p=>p.name),
+    team_b: court.players.slice(2,4).map(p=>p.name),
+    score_a: scoreA??court.scores.a,
+    score_b: scoreB??court.scores.b,
+    duration,
+  };
+  S.history.unshift(entry);
+
+  // update stats
+  court.players.forEach(p=>{
+    p.gamesPlayed = (p.gamesPlayed||0)+1;
+    if(S.roster[p.name]){
+      S.roster[p.name].gamesPlayed = (S.roster[p.name].gamesPlayed||0)+1;
+    }
+  });
+  // Determine winners and losers
+  const winnerIdxs = (entry.score_a >= entry.score_b) ? [0,1] : [2,3];
+  const loserIdxs  = winnerIdxs[0]===0 ? [2,3] : [0,1];
+
+  winnerIdxs.forEach(i=>{
+    const p = court.players[i];
+    if(p){p.wins=(p.wins||0)+1;if(S.roster[p.name])S.roster[p.name].wins=(S.roster[p.name].wins||0)+1;}
+  });
+
+  // Tag each player with W or L and finish order (lower = returned earlier = higher priority)
+  S.finishOrder++;
+  const order = S.finishOrder;
+
+  const winners = winnerIdxs.map(i=>({
+    ...court.players[i],
+    matchResult: 'W',
+    finishOrder: order,
+    id: court.players[i].id + '_' + Date.now() + '_' + i,
+  }));
+  const losers = loserIdxs.map(i=>({
+    ...court.players[i],
+    matchResult: 'L',
+    finishOrder: order,
+    id: court.players[i].id + '_' + Date.now() + '_' + i,
+  }));
+
+  // Clear court
+  court.players = [];
+  court.status = 'empty';
+  S.courtTimers[courtId] = 0;
+  court.scores = {a:0,b:0};
+
+  // Route players to their court's category queue using dual-queue system
+  const courtCat = getCourtCategory(court);
+  pushToQueue([...winners, ...losers], courtCat);
+
+  const catLabel = courtCat==='advanced'?'⚡ Adv/Int queue':'🌱 Beginner queue';
+  toast(`🏁 ${court.name} — Game #${S.gamesPlayed} done! All players → ${catLabel}`, 'success');
+  syncRosterToAllTime();
+  saveSessionQueues();
+  render();
+}
+
+function clearCourt(courtId){
+  const court = S.courts.find(c=>c.id===courtId);
+  if(!court) return;
+  const cat = getCourtCategory(court);
+  const q = getQueue(cat);
+  court.players.forEach(p=>{ delete p.matchResult; delete p.finishOrder; q.unshift(p); });
+  court.players = [];
+  court.status = 'empty';
+  S.courtTimers[courtId] = 0;
+  render();
+  const catLabel=cat==='advanced'?'⚡ Adv/Int':'🌱 Beginner';
+  toast(`${court.name} cleared — players back to ${catLabel} queue`);
+}
+
+function removeCourt(courtId){
+  const court = S.courts.find(c=>c.id===courtId);
+  if(!court) return;
+  S.queue.unshift(...court.players);
+  S.courts = S.courts.filter(c=>c.id!==courtId);
+  render();
+  toast(`Court removed`);
+}
+
+function rotateAll(){
+  const active = S.courts.filter(c=>c.status==='playing'&&c.players.length>=4);
+  if(active.length===0){toast('No active courts with 4 players','warning');return;}
+  active.forEach(c=>openScoreModal(c.id));
+  // if only 1 court, modal opens. if multiple, we do silent rotate for all after first
+  // UX: for multi-court, just rotate silently
+  if(active.length>1){
+    closeModals();
+    active.forEach(c=>rotateCourt(c.id));
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// EXPORT
+// ────────────────────────────────────────────────────────────────────────────
+function exportAll(){
+  syncRosterToAllTime();
+  if(S.history.length===0&&Object.keys(S.roster).length===0){toast('Nothing to export yet','warning');return;}
+  let csv='PickleStack Pro — Session Report\n';
+  csv+=`Date,${new Date().toLocaleDateString('en-PH')}\n`;
+  csv+=`Games Played,${S.gamesPlayed}\n`;
+  csv+=`Total Players,${Object.keys(S.roster).length}\n\n`;
+  csv+='MATCH HISTORY\nGame#,Time,Court,Team A,Score A,Score B,Team B,Duration\n';
+  S.history.forEach(h=>{
+    csv+=`${h.num},${h.time},${h.court},"${h.team_a.join(' & ')}",${h.score_a},${h.score_b},"${h.team_b.join(' & ')}",${fmtMini(h.duration||0)}\n`;
+  });
+  csv+='\nLEADERBOARD\nPlayer,Skill,Games,Wins\n';
+  Object.values(S.roster).sort((a,b)=>(b.gamesPlayed||0)-(a.gamesPlayed||0)).forEach(p=>{
+    csv+=`${p.name},${p.skill},${p.gamesPlayed||0},${p.wins||0}\n`;
+  });
+  const blob = new Blob([csv],{type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `openplay_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('📥 Report exported!', 'success');
+}
+
+function confirmReset(){
+  if(!confirm('Start a new session? All courts, queue, and history will be cleared.')) return;
+  S.courts=[
+    {id:1,name:'Court 1',players:[],status:'empty',timer:0,scores:{a:0,b:0},category:'beginner'},
+    {id:2,name:'Court 2',players:[],status:'empty',timer:0,scores:{a:0,b:0},category:'beginner'},
+    {id:3,name:'Court 3',players:[],status:'empty',timer:0,scores:{a:0,b:0},category:'beginner'},
+  ];
+  S.queues={beginner:[],advanced:[]};
+  S.roster={};S.history=[];S.gamesPlayed=0;
+  S.courtTimers={};S.nextCourtId=4;S.nextPlayerId=1;
+  S.timerSec=0;S.sessionStart=Date.now();S.finishOrder=0;
+  clearSessionQueues();
+  document.getElementById('timer-top').textContent='00:00:00';
+  render();toast('🆕 New session started','info');
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// DRAG & DROP QUEUE
+// ────────────────────────────────────────────────────────────────────────────
+function qDragStart(e,i){S.dragSrcIdx=i;e.dataTransfer.effectAllowed='move';}
+function qDragOver(e,i){e.preventDefault();document.querySelectorAll('.queue-item').forEach((el,idx)=>el.classList.toggle('drag-over',idx===i));}
+function qDrop(e,i){
+  e.preventDefault();
+  document.querySelectorAll('.queue-item').forEach(el=>el.classList.remove('drag-over'));
+  if(S.dragSrcIdx===null||S.dragSrcIdx===i)return;
+  const q=[...S.queue];
+  const item=q.splice(S.dragSrcIdx,1)[0];
+  q.splice(i,0,item);
+  S.queue=q;S.dragSrcIdx=null;
+  renderQueue();renderSidebar();
+}
+function qDragEnd(){document.querySelectorAll('.queue-item').forEach(el=>el.classList.remove('drag-over'));}
+
+// ────────────────────────────────────────────────────────────────────────────
+// PAGE NAVIGATION
+// ────────────────────────────────────────────────────────────────────────────
+function setPage(page){
+  S.currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  const pages = ['dashboard','courts','players','history','stats'];
+  const navItems = document.querySelectorAll('.nav-item');
+  const idx = pages.indexOf(page);
+  if(idx>=0) navItems[idx].classList.add('active');
+  render();
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// RENDER
+// ────────────────────────────────────────────────────────────────────────────
+function render(){
+  renderSidebar();
+  const pages = {
+    dashboard: renderDashboard,
+    courts: renderCourtsPage,
+    players: renderPlayersPage,
+    history: renderHistoryPage,
+    stats: renderStatsPage,
+    roster: renderRosterPage,
+  };
+  (pages[S.currentPage]||renderDashboard)();
+}
+
+function renderSidebar(){
+  const active = S.courts.filter(c=>c.status==='playing').length;
+  const total = S.courts.length;
+  document.getElementById('sidebar-active-count').textContent = active;
+  document.getElementById('sidebar-total-count').textContent = total;
+  document.getElementById('nav-queue-badge').textContent = (S.queues.beginner||[]).length+(S.queues.advanced||[]).length;
+  const dots = document.getElementById('sidebar-court-dots');
+  dots.innerHTML = S.courts.map(c=>`<div class="ccb-dot ${c.status==='playing'?'on':'off'}" title="${c.name}: ${c.status}"></div>`).join('');
+}
+
+// ────────────────── DASHBOARD PAGE ──────────────────
+function renderDashboard(){
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = `
+    <div class="page-title">Open Play Dashboard</div>
+    <div class="page-sub" id="page-sub-date">Today's session overview</div>
+    <div class="stats-grid" id="stats-grid"></div>
+    <div style="display:grid;grid-template-columns:1fr 280px 280px;gap:16px">
+      <div>
+        <div class="panel">
+          <div class="panel-hdr">
+            <span class="panel-title"><span class="pt-icon">🏟</span> Courts</span>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-sm" onclick="addCourt()">+ Add Court</button>
+              <button class="btn btn-sm btn-success" onclick="rotateAll()">🔄 Rotate All</button>
+            </div>
+          </div>
+          <div class="panel-body-tight" id="courts-panel"></div>
+        </div>
+      </div>
+
+      <!-- BEGINNER QUEUE -->
+      <div>
+        <div class="panel" style="border-top:3px solid var(--green)">
+          <div class="panel-hdr" style="flex-direction:column;align-items:stretch;gap:8px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span class="panel-title" style="color:var(--green)">🌱 Beginner Queue</span>
+              <div style="display:flex;gap:5px">
+                <button class="btn btn-sm btn-ghost" onclick="shuffleSpecificQueue('beginner')" title="Shuffle">🎲</button>
+                <button class="btn btn-sm btn-primary" onclick="openAddPlayerModal('beginner')">+ Add</button>
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--text3)">Skill: <span style="color:#6EE7B7;font-weight:600">A — Beginner</span> · <span style="color:#6EE7B7;font-weight:600">B — Beginner+</span></div>
+          </div>
+          <div class="queue-add" style="padding:8px 12px;border-bottom:1px solid var(--border)">
+            <input type="text" id="q-beg-input" placeholder="Quick add beginner…" style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2)" onkeydown="if(event.key==='Enter')quickAddToQueue('beginner',this)"/>
+            <button class="btn btn-sm" style="background:var(--green);border-color:var(--green);color:#fff" onclick="quickAddToQueue('beginner',document.getElementById('q-beg-input'))">Add</button>
+          </div>
+          <div class="queue-list" id="queue-beginner"></div>
+        </div>
+      </div>
+
+      <!-- ADVANCED QUEUE -->
+      <div>
+        <div class="panel" style="border-top:3px solid var(--purple)">
+          <div class="panel-hdr" style="flex-direction:column;align-items:stretch;gap:8px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span class="panel-title" style="color:var(--purple)">⚡ Int/Advanced Queue</span>
+              <div style="display:flex;gap:5px">
+                <button class="btn btn-sm btn-ghost" onclick="shuffleSpecificQueue('advanced')" title="Shuffle">🎲</button>
+                <button class="btn btn-sm btn-primary" onclick="openAddPlayerModal('advanced')">+ Add</button>
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--text3)">Skill: <span style="color:#FCD34D;font-weight:600">C — Intermediate</span> · <span style="color:#F87171;font-weight:600">D — Advanced</span></div>
+          </div>
+          <div class="queue-add" style="padding:8px 12px;border-bottom:1px solid var(--border)">
+            <input type="text" id="q-adv-input" placeholder="Quick add advanced…" style="background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.2)" onkeydown="if(event.key==='Enter')quickAddToQueue('advanced',this)"/>
+            <button class="btn btn-sm" style="background:var(--purple);border-color:var(--purple);color:#fff" onclick="quickAddToQueue('advanced',document.getElementById('q-adv-input'))">Add</button>
+          </div>
+          <div class="queue-list" id="queue-advanced"></div>
+        </div>
+      </div>
+    </div>
+    <div class="page-grid-3">
+      <div class="panel">
+        <div class="panel-hdr">
+          <span class="panel-title"><span class="pt-icon">📋</span> Recent Matches</span>
+          <button class="btn btn-sm btn-ghost" onclick="setPage('history')">See All</button>
+        </div>
+        <div class="panel-body-tight scroll-area" id="history-panel"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr">
+          <span class="panel-title"><span class="pt-icon">🏆</span> Leaderboard</span>
+          <button class="btn btn-sm btn-ghost" onclick="setPage('players')">See All</button>
+        </div>
+        <div class="panel-body-tight scroll-area" id="lb-panel"></div>
+      </div>
+    </div>
+  `;
+  document.getElementById('page-sub-date').textContent = new Date().toLocaleDateString('en-PH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  renderStats();
+  renderCourtsPanel();
+  renderQueue();
+  renderHistory();
+  renderLeaderboard();
+  // Attach autocomplete to quick-add inputs every time dashboard renders
+  setTimeout(()=>{
+    const bi=document.getElementById('q-beg-input');
+    const ai=document.getElementById('q-adv-input');
+    const mi=document.getElementById('ap-name');
+    if(bi&&!bi._acAttached){attachAutocomplete(bi,'beginner');bi._acAttached=true;}
+    if(ai&&!ai._acAttached){attachAutocomplete(ai,'advanced');ai._acAttached=true;}
+    if(mi&&!mi._acAttached){attachAutocomplete(mi,null);mi._acAttached=true;}
+  },50);
+}
+
+function renderStats(){
+  const el = document.getElementById('stats-grid');
+  if(!el) return;
+  const active = S.courts.filter(c=>c.status==='playing').length;
+  const totalP = Object.keys(S.roster).length;
+  const topPlayer = Object.values(S.roster).sort((a,b)=>(b.gamesPlayed||0)-(a.gamesPlayed||0))[0];
+  el.innerHTML = `
+    <div class="stat-card blue"><div class="stat-icon">📚</div><div class="stat-val">${(S.queues.beginner||[]).length+' / '+(S.queues.advanced||[]).length}</div><div class="stat-lbl">In Queue</div><div class="stat-trend">🌱 Beginner / ⚡ Adv</div></div>
+    <div class="stat-card green"><div class="stat-icon">🏟</div><div class="stat-val">${active}<span style="font-size:14px;color:var(--text3)">/${S.courts.length}</span></div><div class="stat-lbl">Courts Active</div><div class="stat-trend">courts playing</div></div>
+    <div class="stat-card amber"><div class="stat-icon">🎮</div><div class="stat-val">${S.gamesPlayed}</div><div class="stat-lbl">Games Played</div><div class="stat-trend">this session</div></div>
+    <div class="stat-card purple"><div class="stat-icon">👥</div><div class="stat-val">${totalP}</div><div class="stat-lbl">Total Players</div><div class="stat-trend">registered today</div></div>
+    <div class="stat-card teal"><div class="stat-icon">⭐</div><div class="stat-val" style="font-size:16px;padding-top:4px">${topPlayer?topPlayer.name.split(' ')[0]:'—'}</div><div class="stat-lbl">Most Active</div><div class="stat-trend">${topPlayer?(topPlayer.gamesPlayed||0)+' games':' '}</div></div>
+  `;
+}
+
+function renderCourtsPanel(){
+  const el = document.getElementById('courts-panel');
+  if(!el) return;
+  if(S.courts.length===0){el.innerHTML='<div class="empty">No courts. Click "Add Court" to start.</div>';return;}
+  el.innerHTML = S.courts.map(court=>{
+    const ct = S.courtTimers[court.id]||0;
+    const pct = Math.min(100,(ct/900)*100);
+    const isPlaying = court.status==='playing';
+    const statusCls = {playing:'sp-playing',ready:'sp-ready',empty:'sp-empty'}[court.status]||'sp-empty';
+    const statusTxt = {playing:'▶ Playing',ready:'Ready',empty:'Empty'}[court.status]||'Empty';
+    const full = court.players.filter(Boolean).length>=4;
+
+    // Build one slot — shows filled player OR inline dropdown
+    const slotHTML = (slotIdx) => {
+      const p = court.players[slotIdx];
+      const avcls = slotIdx<2?'av-a':'av-b';
+      const teamColor = slotIdx<2?'rgba(59,130,246,.12)':'rgba(139,92,246,.12)';
+      const borderColor = slotIdx<2?'rgba(59,130,246,.25)':'rgba(139,92,246,.25)';
+
+      if(p && isPlaying){
+        // During a live match — show player chip with remove ×
+        return `<div id="slot-${court.id}-${slotIdx}" class="court-slot has-player"
+          style="background:${teamColor};border-color:${borderColor}"
+          ondragover="slotDragOver(event,${court.id},${slotIdx})"
+          ondragleave="slotDragLeave(${court.id},${slotIdx})"
+          ondrop="slotDrop(event,${court.id},${slotIdx})">
+          <div class="player-av ${avcls}" style="flex-shrink:0">${av(p.name)}</div>
+          <span style="font-size:12px;font-weight:500;color:var(--text);flex:1;margin-left:6px">${p.name}</span>
+          <span class="skill-tag sk-${p.skill}">${p.skill}</span>
+          <button onclick="removePlayerFromCourt(${court.id},${slotIdx})" title="Move back to queue"
+            style="margin-left:6px;width:16px;height:16px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--text3);cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">×</button>
+        </div>`;
+      } else {
+        // Setup mode — show inline dropdown + drag zone
+        const opts = buildInlineSlotOptions(court.id, slotIdx);
+        const selStyle = `width:100%;background:${p?teamColor:'var(--bg3)'};border:1.5px ${p?'solid '+borderColor:'dashed var(--border2)'};border-radius:var(--radius-sm);height:38px;padding:0 10px;color:var(--text);font-size:12px;font-family:var(--font);cursor:pointer;outline:none`;
+        return `<div id="slot-${court.id}-${slotIdx}" class="court-slot ${p?'has-player':''}"
+          style="${p?'background:'+teamColor+';border-color:'+borderColor:''};padding:4px 6px"
+          ondragover="slotDragOver(event,${court.id},${slotIdx})"
+          ondragleave="slotDragLeave(${court.id},${slotIdx})"
+          ondrop="slotDrop(event,${court.id},${slotIdx})">
+          ${p?`<div class="player-av ${avcls}" style="flex-shrink:0;margin-right:6px">${av(p.name)}</div>`:''}
+          <div style="flex:1;display:flex;align-items:center;gap:6px">
+            <select id="inline-sel-${court.id}-${slotIdx}"
+              onchange="onInlineSlotChange(${court.id},${slotIdx},this.value)"
+              style="${selStyle}">
+              ${p?`<option value="${p.id}" selected>${p.name} [${p.skill}]</option>`:''}
+              ${opts}
+            </select>
+            ${p?`<button onclick="removePlayerFromCourt(${court.id},${slotIdx})" title="Remove"
+              style="width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--text3);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">×</button>`:''}
+          </div>
+        </div>`;
+      }
+    };
+
+    const playersHTML = `
+      <div id="court-drop-${court.id}"
+        ondragover="courtDragOver(event,${court.id})"
+        ondragleave="courtDragLeave(${court.id})"
+        ondrop="courtDrop(event,${court.id})"
+        style="display:grid;grid-template-columns:1fr 44px 1fr;gap:8px;align-items:start">
+        <div>
+          <div class="drop-slot-lbl" style="color:#60A5FA;padding:0 2px 5px">🔵 TEAM A</div>
+          ${slotHTML(0)}
+          <div style="height:6px"></div>
+          ${slotHTML(1)}
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;padding-top:32px">
+          <div class="vs-badge">VS</div>
+        </div>
+        <div>
+          <div class="drop-slot-lbl" style="color:#A78BFA;padding:0 2px 5px">🟣 TEAM B</div>
+          ${slotHTML(2)}
+          <div style="height:6px"></div>
+          ${slotHTML(3)}
+        </div>
+      </div>`;
+
+    // Start Match button — disabled unless all 4 filled and not yet playing
+    const startBtn = !isPlaying ? `<button
+        id="start-match-btn-${court.id}"
+        onclick="startMatch(${court.id})"
+        ${full?'':'disabled'}
+        style="height:34px;padding:0 16px;border-radius:var(--radius-sm);border:none;font-size:12px;font-weight:600;font-family:var(--font);cursor:${full?'pointer':'not-allowed'};transition:all .15s;${full?'background:var(--green);color:#fff;':'background:var(--bg4);color:var(--text3);opacity:0.45;'}"
+        title="${full?'Start the match':'Fill all 4 slots to enable'}">
+        ${full?'🏓 Start Match':'🔒 Start Match'}
+      </button>` : '';
+
+    return `<div class="court-card">
+      <div class="court-header">
+        <div class="court-name" style="display:flex;align-items:center;flex-wrap:wrap;gap:6px">🏓 <span id="court-name-lbl-${court.id}" onclick="startInlineRename(${court.id})" title="Click to rename" style="cursor:pointer;border-bottom:1px dashed var(--text3)">${court.name}</span> <span class="status-pill ${statusCls}">${statusTxt}</span> <button onclick="toggleCourtCategory(${court.id})" title="Toggle: Beginner / Adv+Int" style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;border:1px solid ${court.category==='advanced'?'rgba(139,92,246,.4)':'rgba(16,185,129,.4)'};background:${court.category==='advanced'?'rgba(139,92,246,.12)':'rgba(16,185,129,.1)'};color:${court.category==='advanced'?'#A78BFA':'#34D399'};cursor:pointer">${court.category==='advanced'?'⚡ Adv/Int':'🌱 Beginner'}</button> <button class="icon-btn" onclick="startInlineRename(${court.id})" title="Rename" style="width:20px;height:20px;font-size:11px;color:var(--text3)">✎</button></div>
+        <div class="court-actions" style="display:flex;align-items:center;gap:6px">
+          <span class="court-timer" id="ct-lbl-${court.id}">${fmtMini(ct)}</span>
+          ${!isPlaying&&!full?`<button class="btn btn-sm" onclick="fillCourt(${court.id})" title="Auto-fill from queue">Auto-Fill</button>`:''}
+          ${startBtn}
+          ${isPlaying?`<button class="btn btn-sm btn-success" onclick="openScoreModal(${court.id})">🏁 Game Over</button>`:''}
+          ${court.players.length>0?`<button class="btn btn-sm btn-ghost" onclick="clearCourt(${court.id})" title="Clear court">✕</button>`:''}
+        </div>
+      </div>
+      ${playersHTML}
+      ${isPlaying?`<div class="ct-bar" style="margin-top:10px"><div class="ct-fill" id="ct-fill-${court.id}" style="width:${pct}%"></div></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderQueueInto(elId, cat){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  const q = S.queues[cat]||[];
+  if(q.length===0){
+    el.innerHTML=`<div class="queue-empty"><div class="qe-icon">📭</div>${cat==='advanced'?'No Adv/Int players yet.':'No beginners yet.'}<br>Add players above.</div>`;
+    return;
+  }
+  const winners  = q.map((p,i)=>({p,i})).filter(x=>x.p.matchResult==='W');
+  const losers   = q.map((p,i)=>({p,i})).filter(x=>x.p.matchResult==='L');
+  const untagged = q.map((p,i)=>({p,i})).filter(x=>!x.p.matchResult);
+
+  const renderItem = ({p,i}) => {
+    const wlClass = p.matchResult==='W'?'q-win':p.matchResult==='L'?'q-lose':'';
+    const wlBadge = p.matchResult
+      ? `<div class="wl-badge ${p.matchResult==='W'?'wl-w':'wl-l'}">${p.matchResult}</div>`
+      : `<div style="width:20px"></div>`;
+    const avStyle = p.matchResult==='W'?'background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.3)'
+      :p.matchResult==='L'?'background:rgba(239,68,68,.12);color:#F87171;border:1px solid rgba(239,68,68,.25)'
+      :cat==='advanced'?'background:rgba(139,92,246,.12);color:#A78BFA':'background:rgba(16,185,129,.08);color:#6EE7B7';
+    return `<div class="queue-item ${wlClass}" draggable="true"
+      ondragstart="queueDragStart(event,${i})"
+      ondragend="queueDragEnd(event)" title="${p.finishOrder?'Finish order #'+p.finishOrder:''}">
+      <span class="q-pos">${i+1}</span>
+      ${wlBadge}
+      <div class="q-av" style="${avStyle}">${av(p.name)}</div>
+      <div class="q-info">
+        <div class="q-name">${p.name}</div>
+        <div class="q-sub"><span class="skill-tag sk-${p.skill}" style="font-size:9px">${p.skill}</span> · ${p.gamesPlayed||0}g${p.wins?' · '+p.wins+'W':''}</div>
+      </div>
+      <div class="q-actions">
+        <button class="icon-btn del" onclick="removeFromQueue('${p.id}')" title="Remove">✕</button>
+      </div>
+    </div>`;
+  };
+
+  // Split untagged into never-played vs played-but-resting
+  const neverPlayed = q.map((p,i)=>({p,i})).filter(x=>!x.p.matchResult&&(x.p.gamesPlayed||0)===0);
+  const restingPlayed = q.map((p,i)=>({p,i})).filter(x=>!x.p.matchResult&&(x.p.gamesPlayed||0)>0);
+
+  // Special notice: 1-2 unplayed remain → they'll be paired with winners
+  const unplayedCount = neverPlayed.length;
+  const winnersCount  = winners.length;
+  const specialPair   = unplayedCount>0&&unplayedCount<=2&&winnersCount>=(4-unplayedCount);
+
+  let html='';
+  if(neverPlayed.length>0){
+    html+=`<div class="q-group-hdr" style="color:#22c55e">🆕 Never Played — Priority</div>`;
+    if(specialPair) html+=`<div style="font-size:10px;color:#FCD34D;padding:3px 18px 5px;background:rgba(245,158,11,.06);margin:0">⚡ ${unplayedCount===1?'1 unplayed':'2 unplayed'} → will be paired with top winner${unplayedCount<2?'s':''}</div>`;
+    html+=neverPlayed.map(renderItem).join('');
+  }
+  if(winners.length>0){
+    html+=`<div class="q-group-hdr win-hdr">🏆 Winners — next after unplayed</div>`;
+    html+=winners.map(renderItem).join('');
+  }
+  if(losers.length>0){
+    html+=`<div class="q-group-hdr lose-hdr">💔 Losers — after winners</div>`;
+    html+=losers.map(renderItem).join('');
+  }
+  if(restingPlayed.length>0){
+    html+=`<div class="q-group-hdr plain-hdr">💤 Resting — played before</div>`;
+    html+=restingPlayed.map(renderItem).join('');
+  }
+  el.innerHTML=html;
+}
+
+function renderQueue(){
+  renderQueueInto('queue-beginner','beginner');
+  renderQueueInto('queue-advanced','advanced');
+  const legEl=document.getElementById('queue-panel');
+  if(legEl) legEl.innerHTML='';
+}
+
+
+function renderHistory(){
+  const el = document.getElementById('history-panel');
+  if(!el) return;
+  if(S.history.length===0){el.innerHTML='<div class="empty">No matches yet.</div>';return;}
+  el.innerHTML = S.history.slice(0,15).map(h=>`
+    <div class="history-item">
+      <span class="hi-num">#${h.num}</span>
+      <span class="hi-court">${h.court}</span>
+      <span class="hi-teams"><span style="color:#60A5FA">${h.team_a.join(' & ')}</span> <span style="color:var(--text3)">${h.score_a??''}${h.score_a!==undefined&&h.score_b!==undefined?'–'+h.score_b:''}</span> <span style="color:#A78BFA">${h.team_b.join(' & ')}</span></span>
+      <span class="hi-time">${h.time}</span>
+    </div>`).join('');
+}
+
+function renderLeaderboard(){
+  const el = document.getElementById('lb-panel');
+  if(!el) return;
+  const players = Object.values(S.roster).sort((a,b)=>(b.gamesPlayed||0)-(a.gamesPlayed||0)).slice(0,10);
+  if(players.length===0){el.innerHTML='<div class="empty">No data yet.</div>';return;}
+  const max = players[0].gamesPlayed||1;
+  el.innerHTML = players.map((p,i)=>{
+    const rankCls = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n';
+    const rankIcon = i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}`;
+    const winRate = p.gamesPlayed>0?Math.round((p.wins||0)/p.gamesPlayed*100):0;
+    return `<div class="lb-item">
+      <div class="lb-rank ${rankCls}">${rankIcon}</div>
+      <div class="lb-av">${av(p.name)}</div>
+      <div style="flex:1">
+        <div class="lb-name">${p.name} <span class="skill-tag sk-${p.skill}" style="font-size:9px">${p.skill}</span></div>
+        <div class="lb-bar" style="width:${Math.round((p.gamesPlayed||0)/max*100)}%;margin-top:4px"></div>
+      </div>
+      <div class="lb-games">${p.gamesPlayed||0}g · ${winRate}%W</div>
+    </div>`;
+  }).join('');
+}
+
+// ────────────────── COURTS PAGE ──────────────────
+function renderCourtsPage(){
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div><div class="page-title">Courts</div><div class="page-sub">Manage all courts and assignments</div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" onclick="addCourt()">+ Add Court</button>
+        <button class="btn btn-sm btn-success" onclick="rotateAll()">🔄 Rotate All</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px" id="courts-full"></div>
+  `;
+  const el = document.getElementById('courts-full');
+  if(S.courts.length===0){el.innerHTML='<div class="empty" style="padding:40px">No courts added.</div>';return;}
+  el.innerHTML = S.courts.map(court=>{
+    const ct = S.courtTimers[court.id]||0;
+    const pct = Math.min(100,(ct/900)*100);
+    const statusCls = {playing:'sp-playing',ready:'sp-ready',empty:'sp-empty'}[court.status]||'sp-empty';
+    const statusTxt = {playing:'▶ Playing',ready:'Ready',empty:'Empty'}[court.status]||'Empty';
+    const teamA = court.players.slice(0,2);
+    const teamB = court.players.slice(2,4);
+    const chip = (p,avcls,idx) => `<div class="player-pill" style="position:relative"><div class="player-av ${avcls}">${av(p.name)}</div>${p.name}<span class="skill-tag sk-${p.skill}">${p.skill}</span><button onclick="removePlayerFromCourt(${court.id},${idx})" title="Move back to queue" style="margin-left:6px;width:16px;height:16px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--text3);cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">×</button></div>`;
+    return `<div class="panel">
+      <div class="panel-hdr">
+        <span class="panel-title">🏓 <span id="court-name-lbl-${court.id}" onclick="startInlineRename(${court.id})" title="Click to rename" style="cursor:pointer;border-bottom:1px dashed var(--text3)">${court.name}</span> <button class="icon-btn" onclick="startInlineRename(${court.id})" title="Rename court" style="width:20px;height:20px;font-size:11px;color:var(--text3)">✎</button></span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="status-pill ${statusCls}">${statusTxt}</span>
+          <span class="court-timer">${fmtMini(ct)}</span>
+        </div>
+      </div>
+      <div class="panel-body">
+        ${court.players.length===0?`<div class="empty-court" onclick="fillCourt(${court.id})" style="margin-bottom:12px"><div style="font-size:28px">🏓</div><div class="fill-btn">+ Fill from Queue</div></div>`:`
+        <div style="margin-bottom:10px">
+          <div class="section-label" style="color:#60A5FA;margin-bottom:6px">🔵 Team A</div>
+          <div style="display:flex;flex-direction:column;gap:5px">${teamA.map(p=>chip(p,'av-a')).join('')}</div>
+          <div style="text-align:center;margin:8px 0;font-size:11px;font-weight:700;color:var(--text3)">— VS —</div>
+          <div class="section-label" style="color:#A78BFA;margin-bottom:6px">🟣 Team B</div>
+          <div style="display:flex;flex-direction:column;gap:5px">${teamB.map(p=>chip(p,'av-b')).join('')}</div>
+        </div>
+        ${court.status==='playing'?`<div class="ct-bar" style="margin-bottom:10px"><div class="ct-fill" style="width:${pct}%"></div></div>`:''}
+        `}
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${court.players.length<4?`<button class="btn btn-sm btn-primary" onclick="fillCourt(${court.id})">Fill from Queue</button>`:''}
+          <button class="btn btn-sm" onclick="openManualAssign(${court.id})">👤 Assign Player</button>
+          ${court.players.length>=4?`<button class="btn btn-sm btn-success" onclick="openScoreModal(${court.id})">🏁 Game Over</button>`:''}
+          ${court.players.length>0?`<button class="btn btn-sm btn-danger" onclick="clearCourt(${court.id})">Clear</button>`:''}
+          <button class="btn btn-sm btn-ghost" onclick="startInlineRename(${court.id})">✎ Rename</button>
+          <button class="btn btn-sm btn-ghost" onclick="if(confirm('Remove this court?'))removeCourt(${court.id})">Remove Court</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ────────────────── PLAYERS PAGE ──────────────────
+function renderPlayersPage(){
+  const mc = document.getElementById('main-content');
+  const players = Object.values(S.roster).sort((a,b)=>(b.gamesPlayed||0)-(a.gamesPlayed||0));
+  mc.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div><div class="page-title">Players</div><div class="page-sub">${players.length} players registered this session</div></div>
+      <button class="btn btn-primary" onclick="openAddPlayerModal()">+ Add Player</button>
+    </div>
+    <div class="panel">
+      <div class="panel-body-tight">
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr style="border-bottom:1px solid var(--border)">
+            <th style="padding:10px 18px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Player</th>
+            <th style="padding:10px 18px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Skill</th>
+            <th style="padding:10px 18px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Games</th>
+            <th style="padding:10px 18px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Wins</th>
+            <th style="padding:10px 18px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Win %</th>
+            <th style="padding:10px 18px;text-align:right;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Status</th>
+          </tr></thead>
+          <tbody>${players.length===0?`<tr><td colspan="6" style="padding:40px;text-align:center;color:var(--text3)">No players yet. Add players to get started.</td></tr>`:players.map((p,i)=>{
+            const winRate = p.gamesPlayed>0?Math.round((p.wins||0)/p.gamesPlayed*100):0;
+            const inQueue = S.queue.some(q=>q.name===p.name);
+            const onCourt = S.courts.some(c=>c.players.some(cp=>cp.name===p.name));
+            const statusTag = onCourt?`<span class="tag" style="background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.2)">On Court</span>`:inQueue?`<span class="tag" style="background:rgba(59,130,246,.15);color:#60A5FA;border:1px solid rgba(59,130,246,.2)">In Queue</span>`:`<span class="tag" style="background:var(--bg4);color:var(--text3);border:1px solid var(--border)">Sitting</span>`;
+            return `<tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 18px"><div style="display:flex;align-items:center;gap:10px"><div style="width:30px;height:30px;border-radius:50%;background:rgba(59,130,246,.1);color:#60A5FA;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${av(p.name)}</div><div><div style="font-size:13px;font-weight:500;color:var(--text)">${p.name}</div><div style="font-size:10px;color:var(--text3)">#${i+1} overall</div></div></div></td>
+              <td style="text-align:center"><span class="skill-tag sk-${p.skill}">${p.skill}</span></td>
+              <td style="text-align:center;font-size:13px;color:var(--text);font-variant-numeric:tabular-nums">${p.gamesPlayed||0}</td>
+              <td style="text-align:center;font-size:13px;color:var(--text);font-variant-numeric:tabular-nums">${p.wins||0}</td>
+              <td style="text-align:center;font-size:13px;color:${winRate>=50?'var(--green)':'var(--text2)'};font-variant-numeric:tabular-nums">${winRate}%</td>
+              <td style="text-align:right;padding-right:18px">${statusTag}</td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ────────────────── HISTORY PAGE ──────────────────
+function renderHistoryPage(){
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div><div class="page-title">Match History</div><div class="page-sub">${S.history.length} matches played this session</div></div>
+      <button class="btn btn-sm" onclick="exportAll()">⬇ Export CSV</button>
+    </div>
+    <div class="panel">
+      <div class="panel-body-tight">
+        ${S.history.length===0?`<div class="empty" style="padding:40px">No matches yet.</div>`:`<table style="width:100%;border-collapse:collapse">
+          <thead><tr style="border-bottom:1px solid var(--border)">
+            <th style="padding:10px 18px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">#</th>
+            <th style="padding:10px 18px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Time</th>
+            <th style="padding:10px 18px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Court</th>
+            <th style="padding:10px 18px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Team A</th>
+            <th style="padding:10px 18px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Score</th>
+            <th style="padding:10px 18px;text-align:right;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Team B</th>
+            <th style="padding:10px 18px;text-align:right;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Duration</th>
+          </tr></thead>
+          <tbody>${S.history.map(h=>{
+            const aWon = (h.score_a||0)>=(h.score_b||0);
+            return `<tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 18px;font-size:12px;color:var(--text3);font-variant-numeric:tabular-nums">#${h.num}</td>
+              <td style="padding:10px 18px;font-size:12px;color:var(--text2)">${h.time}</td>
+              <td style="padding:10px 18px;font-size:12px;font-weight:600;color:var(--accent)">${h.court}</td>
+              <td style="padding:10px 18px;font-size:12px;color:${aWon?'var(--green)':'var(--text2)'}">${h.team_a.join(' & ')} ${aWon?'🏆':''}</td>
+              <td style="padding:10px 18px;text-align:center;font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--text)">${h.score_a??'—'} – ${h.score_b??'—'}</td>
+              <td style="padding:10px 18px;font-size:12px;text-align:right;color:${!aWon?'var(--green)':'var(--text2)'}"> ${!aWon?'🏆':''} ${h.team_b.join(' & ')}</td>
+              <td style="padding:10px 18px;font-size:12px;color:var(--text3);text-align:right">${fmtMini(h.duration||0)}</td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>`}
+      </div>
+    </div>
+  `;
+}
+
+// ────────────────── ROSTER PAGE ──────────────────
+function renderRosterPage(){
+  const mc = document.getElementById('main-content');
+  const players = Object.values(allTimeRoster).sort((a,b)=>(b.gamesPlayed||0)-(a.gamesPlayed||0));
+  mc.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <div class="page-title">📒 Player Roster</div>
+        <div class="page-sub">${players.length} players on record across all sessions</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm btn-danger" onclick="if(confirm('Clear all-time roster? This cannot be undone.'))clearAllTimeRoster()">🗑 Clear Roster</button>
+        <button class="btn btn-sm btn-primary" onclick="openAddPlayerModal()">+ Add Player</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div style="padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
+        <input type="text" id="roster-search" placeholder="🔍 Search players…" oninput="filterRosterTable(this.value)"
+          style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:0 12px;height:36px;color:var(--text);font-size:13px;font-family:var(--font)"/>
+        <span style="font-size:11px;color:var(--text3)" id="roster-count">${players.length} players</span>
+      </div>
+      <div class="panel-body-tight">
+        <table style="width:100%;border-collapse:collapse" id="roster-table">
+          <thead><tr style="border-bottom:1px solid var(--border)">
+            <th style="padding:10px 18px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Player</th>
+            <th style="padding:10px 18px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Skill</th>
+            <th style="padding:10px 18px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Total Games</th>
+            <th style="padding:10px 18px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Wins</th>
+            <th style="padding:10px 18px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Win %</th>
+            <th style="padding:10px 18px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Last Seen</th>
+            <th style="padding:10px 18px;text-align:right;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase">Action</th>
+          </tr></thead>
+          <tbody id="roster-tbody">${players.length===0
+            ?`<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--text3)">No players yet. Players are saved automatically after each game.</td></tr>`
+            :players.map((p,i)=>{
+              const winRate=p.gamesPlayed>0?Math.round((p.wins||0)/p.gamesPlayed*100):0;
+              const lastDate=p.lastSeen?new Date(p.lastSeen).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}):'—';
+              const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+              return `<tr style="border-bottom:1px solid var(--border)" class="roster-row">
+                <td style="padding:10px 18px"><div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:30px;height:30px;border-radius:50%;background:rgba(59,130,246,.1);color:#60A5FA;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${p.name.slice(0,2).toUpperCase()}</div>
+                  <div><div style="font-size:13px;font-weight:500;color:var(--text)">${rank} ${p.name}</div><div style="font-size:10px;color:var(--text3)">All-time record</div></div>
+                </div></td>
+                <td style="text-align:center"><span class="skill-tag sk-${p.skill}">${p.skill}</span></td>
+                <td style="text-align:center;font-size:13px;color:var(--text);font-variant-numeric:tabular-nums">${p.gamesPlayed||0}</td>
+                <td style="text-align:center;font-size:13px;color:var(--text);font-variant-numeric:tabular-nums">${p.wins||0}</td>
+                <td style="text-align:center;font-size:13px;font-variant-numeric:tabular-nums;color:${winRate>=50?'var(--green)':'var(--text2)'}">${winRate}%</td>
+                <td style="text-align:center;font-size:11px;color:var(--text3)">${lastDate}</td>
+                <td style="text-align:right;padding-right:18px">
+                  <button onclick="addFromRoster('${p.name.replace(/'/g,"\'")}','${p.skill}')" class="btn btn-sm btn-ghost" style="font-size:10px">+ Add to Queue</button>
+                  <button onclick="deleteFromRoster('${p.name.replace(/'/g,"\'")}',this)" class="btn btn-sm" style="font-size:10px;color:var(--red);border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05);margin-left:4px">🗑</button>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function filterRosterTable(query){
+  const rows = document.querySelectorAll('#roster-tbody .roster-row');
+  let visible=0;
+  rows.forEach(row=>{
+    const name=row.querySelector('td:first-child').textContent.toLowerCase();
+    const show=!query||name.includes(query.toLowerCase());
+    row.style.display=show?'':'none';
+    if(show)visible++;
+  });
+  const cnt=document.getElementById('roster-count');
+  if(cnt)cnt.textContent=visible+' players';
+}
+
+function addFromRoster(name, skill){
+  const id='p'+S.nextPlayerId++;
+  const player={id,name,skill,gamesPlayed:0,wins:0,addedAt:Date.now()};
+  const cat=getPlayerCategory(skill);
+  getQueue(cat).push(player);
+  if(!S.roster[name]) S.roster[name]={...player};
+  render();
+  toast(`✅ ${name} added to ${cat==='advanced'?'⚡ Adv/Int':'🌱 Beginner'} queue`,'success');
+}
+
+function deleteFromRoster(name, btn){
+  const key=name.toLowerCase().trim();
+  delete allTimeRoster[key];
+  saveAllTimeRoster();
+  const row=btn.closest('tr');
+  if(row) row.remove();
+  toast(`🗑 ${name} removed from roster`,'info');
+}
+
+function clearAllTimeRoster(){
+  allTimeRoster={};
+  saveAllTimeRoster();
+  renderRosterPage();
+  toast('Roster cleared','info');
+}
+
+// ────────────────── STATS PAGE ──────────────────
+function renderStatsPage(){
+  const mc = document.getElementById('main-content');
+  const players = Object.values(S.roster).sort((a,b)=>(b.gamesPlayed||0)-(a.gamesPlayed||0));
+  const maxGames = players[0]?.gamesPlayed||1;
+  const avgGames = players.length>0?(players.reduce((s,p)=>s+(p.gamesPlayed||0),0)/players.length).toFixed(1):0;
+  const totalMins = S.history.reduce((s,h)=>s+(h.duration||0),0);
+  const avgDur = S.history.length>0?Math.round(totalMins/S.history.length/60):0;
+  const courtStats = {};
+  S.history.forEach(h=>{
+    if(!courtStats[h.court]) courtStats[h.court]={games:0};
+    courtStats[h.court].games++;
+  });
+  mc.innerHTML = `
+    <div class="page-title" style="margin-bottom:4px">Statistics</div>
+    <div class="page-sub" style="margin-bottom:20px">Session insights and performance metrics</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+      <div class="stat-card blue"><div class="stat-icon">🎮</div><div class="stat-val">${S.gamesPlayed}</div><div class="stat-lbl">Total Games</div></div>
+      <div class="stat-card green"><div class="stat-icon">👥</div><div class="stat-val">${players.length}</div><div class="stat-lbl">Unique Players</div></div>
+      <div class="stat-card amber"><div class="stat-icon">⏱</div><div class="stat-val">${avgDur}<span style="font-size:14px">m</span></div><div class="stat-lbl">Avg Game Duration</div></div>
+      <div class="stat-card purple"><div class="stat-icon">📊</div><div class="stat-val">${avgGames}</div><div class="stat-lbl">Avg Games/Player</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="panel">
+        <div class="panel-hdr"><span class="panel-title">🏃 Player Activity</span></div>
+        <div class="panel-body-tight" style="padding:8px 0">
+          ${players.length===0?`<div class="empty" style="padding:24px">No data yet.</div>`:players.slice(0,12).map(p=>{
+            const pct = Math.round((p.gamesPlayed||0)/maxGames*100);
+            const winRate = p.gamesPlayed>0?Math.round((p.wins||0)/p.gamesPlayed*100):0;
+            return `<div class="heat-row">
+              <div class="heat-name">${p.name} <span class="skill-tag sk-${p.skill}" style="font-size:9px">${p.skill}</span></div>
+              <div class="heat-bar-wrap"><div class="heat-bar-fill" style="width:${pct}%"></div></div>
+              <div class="heat-val">${p.gamesPlayed||0}g</div>
+              <div style="font-size:11px;color:${winRate>=50?'var(--green)':'var(--text3)'};min-width:36px;text-align:right">${winRate}%W</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr"><span class="panel-title">🏟 Court Utilization</span></div>
+        <div class="panel-body-tight" style="padding:8px 0">
+          ${Object.keys(courtStats).length===0?`<div class="empty" style="padding:24px">No data yet.</div>`:Object.entries(courtStats).map(([court,cs])=>{
+            const pct = S.gamesPlayed>0?Math.round(cs.games/S.gamesPlayed*100):0;
+            return `<div class="heat-row">
+              <div class="heat-name" style="color:var(--accent)">${court}</div>
+              <div class="heat-bar-wrap"><div class="heat-bar-fill" style="width:${pct}%"></div></div>
+              <div class="heat-val">${cs.games} games</div>
+              <div style="font-size:11px;color:var(--text3);min-width:36px;text-align:right">${pct}%</div>
+            </div>`;
+          }).join('')}
+          <div style="padding:14px 18px;border-top:1px solid var(--border);margin-top:8px">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Session time breakdown</div>
+            <div style="font-size:13px;color:var(--text2)">⏱ Running: <strong style="color:var(--text)">${fmtTime(S.timerSec)}</strong></div>
+            <div style="font-size:13px;color:var(--text2);margin-top:4px">🏃 Active games: <strong style="color:var(--text)">${S.courts.filter(c=>c.status==='playing').length} courts</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// QUICK ADD (inline)
+// ────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────
+// INLINE COURT SLOT DROPDOWNS
+// ────────────────────────────────────────────────────────────────────────────
+function shuffleSpecificQueue(cat){
+  const q=S.queues[cat];
+  for(let i=q.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [q[i],q[j]]=[q[j],q[i]];
+  }
+  render();
+  toast(`🎲 ${cat==='advanced'?'Adv/Int':'Beginner'} queue shuffled!`,'info');
+}
+
+let addModalTargetCat = null;
+function openAddPlayerModal(cat){
+  addModalTargetCat = cat||null;
+  document.getElementById('ap-name').value='';
+  document.getElementById('modal-add').classList.add('open');
+  // Pre-select skill matching the target category
+  if(cat==='advanced'){
+    selectSkillByValue('C');
+  } else if(cat==='beginner'){
+    selectSkillByValue('A');
+  }
+  setTimeout(()=>document.getElementById('ap-name').focus(),80);
+}
+function selectSkillByValue(skill){
+  document.querySelectorAll('.skill-opt').forEach(o=>{
+    o.classList.toggle('selected', o.dataset.skill===skill);
+  });
+  S.selectedSkill=skill;
+}
+
+function quickAddToQueue(cat, inputEl){
+  const name=(inputEl?inputEl.value:'').trim();
+  if(!name){toast('Enter a player name','warning');return;}
+  const skill=cat==='advanced'?'C':'A';
+  const id='p'+S.nextPlayerId++;
+  const player={id,name,skill,gamesPlayed:0,wins:0,addedAt:Date.now()};
+  getQueue(cat).push(player);
+  if(!S.roster[name]) S.roster[name]={...player};
+  if(inputEl) inputEl.value='';
+  render();
+  toast(`✅ ${name} → ${cat==='advanced'?'⚡ Adv/Int':'🌱 Beginner'} queue`,'success');
+}
+
+function toggleCourtCategory(courtId){
+  const court=S.courts.find(c=>c.id===courtId);
+  if(!court) return;
+  const newCat=court.category==='advanced'?'beginner':'advanced';
+  // If court has active players, confirm first
+  if(court.players.length>0){
+    if(!confirm(`${court.name} has players assigned. Changing category will clear the court and return players to queue. Continue?`)) return;
+  }
+  setCategoryOnCourt(courtId, newCat);
+}
+
+function buildInlineSlotOptions(courtId, slotIdx){
+  const court = S.courts.find(c=>c.id===courtId);
+  const cat = getCourtCategory(court||{});
+  const thisCourtOtherNames = new Set(
+    court ? court.players.filter((_,i)=>i!==slotIdx).filter(Boolean).map(p=>p.name) : []
+  );
+  const onOtherCourts = new Set(
+    S.courts.filter(c=>c.id!==courtId).flatMap(c=>c.players.map(p=>p.name))
+  );
+  const q = getQueue(cat);
+  const inQueueNames = new Set(q.map(p=>p.name));
+  // Show category-matched queue players first, then any available roster
+  const available = [
+    ...q,
+    ...Object.values(S.roster).filter(p=>!onOtherCourts.has(p.name)&&!inQueueNames.has(p.name)&&!thisCourtOtherNames.has(p.name)&&getPlayerCategory(p.skill)===cat)
+  ].filter(p=>!thisCourtOtherNames.has(p.name));
+
+  const blank = '<option value="">— pick player —</option>';
+  return blank + available.map(p=>{
+    const tag = p.matchResult?` [${p.matchResult}]`:'';
+    return `<option value="${p.id}">${p.name} [${p.skill}]${tag}</option>`;
+  }).join('');
+}
+
+function onInlineSlotChange(courtId, slotIdx, playerId){
+  if(!playerId) return;
+  const court = S.courts.find(c=>c.id===courtId);
+  if(!court) return;
+
+  // Find player in either queue or roster
+  let player = null;
+  let src = 'queue';
+  let srcCat = 'beginner';
+  for(const cat of ['beginner','advanced']){
+    const found = S.queues[cat].find(p=>p.id===playerId);
+    if(found){player=found;srcCat=cat;break;}
+  }
+  if(!player){
+    player = Object.values(S.roster).find(p=>p.id===playerId);
+    src = 'roster';
+  }
+  if(!player){ render(); return; }
+
+  // Clone so we don't mutate shared roster object
+  player = {...player};
+  delete player.matchResult;
+  delete player.finishOrder;
+
+  // Remove from correct queue
+  if(src==='queue'){
+    const idx = S.queues[srcCat].findIndex(p=>p.id===playerId);
+    if(idx!==-1) S.queues[srcCat].splice(idx,1);
+  }
+
+  // Bump existing occupant in this slot back to queue
+  const existing = court.players[slotIdx];
+  if(existing && existing.id !== player.id){
+    S.queue.unshift(existing);
+  }
+
+  // Place player
+  while(court.players.length<=slotIdx) court.players.push(null);
+  court.players[slotIdx] = player;
+  court.players = court.players.filter(Boolean);
+
+  // Do NOT set status to 'playing' yet — wait for Start Match
+  court.status = court.players.length>=4?'ready':court.players.length>0?'ready':'empty';
+
+  render();
+  // After render, re-select this slot's dropdown value so it stays visible
+  const sel = document.getElementById(`inline-sel-${courtId}-${slotIdx}`);
+  if(sel) sel.value = playerId;
+  checkStartMatchBtn(courtId);
+}
+
+function checkStartMatchBtn(courtId){
+  const court = S.courts.find(c=>c.id===courtId);
+  const btn = document.getElementById(`start-match-btn-${courtId}`);
+  if(!btn||!court) return;
+  const full = court.players.length>=4 && court.players.filter(Boolean).length>=4;
+  btn.disabled = !full;
+  if(full){
+    btn.className='btn btn-success btn-sm';
+    btn.style.opacity='1';
+    btn.style.cursor='pointer';
+  } else {
+    btn.className='btn btn-sm';
+    btn.style.opacity='0.4';
+    btn.style.cursor='not-allowed';
+    btn.style.background='var(--bg4)';
+    btn.style.color='var(--text3)';
+  }
+}
+
+function startMatch(courtId){
+  const court = S.courts.find(c=>c.id===courtId);
+  if(!court) return;
+  if(court.players.filter(Boolean).length<4){toast('All 4 slots must be filled first','warning');return;}
+  court.status='playing';
+  S.courtTimers[courtId]=0;
+  render();
+  toast(`🏓 Match started on ${court.name}!`,'success');
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// DRAG FROM QUEUE → COURT SLOTS
+// ────────────────────────────────────────────────────────────────────────────
+let dragQueueIdx = null;  // index in S.queue being dragged
+
+function queueDragStart(e, idx){
+  dragQueueIdx = idx;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', String(idx));
+  setTimeout(()=>{ const el=e.target; if(el)el.style.opacity='.4'; },0);
+}
+function queueDragEnd(e){
+  if(e.target) e.target.style.opacity='';
+  dragQueueIdx = null;
+}
+
+function slotDragOver(e, courtId, slotIdx){
+  if(dragQueueIdx===null) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  const el = document.getElementById(`slot-${courtId}-${slotIdx}`);
+  if(el) el.classList.add('drag-over-zone');
+}
+function slotDragLeave(courtId, slotIdx){
+  const el = document.getElementById(`slot-${courtId}-${slotIdx}`);
+  if(el) el.classList.remove('drag-over-zone');
+}
+function slotDrop(e, courtId, slotIdx){
+  e.preventDefault();
+  const el = document.getElementById(`slot-${courtId}-${slotIdx}`);
+  if(el) el.classList.remove('drag-over-zone');
+  if(dragQueueIdx===null) return;
+  dropPlayerToSlot(dragQueueIdx, courtId, slotIdx);
+  dragQueueIdx = null;
+}
+
+// Drop anywhere on an empty court (auto-fill next open slot)
+function courtDragOver(e, courtId){
+  if(dragQueueIdx===null) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  const el = document.getElementById(`court-drop-${courtId}`);
+  if(el) el.classList.add('drag-over-zone');
+}
+function courtDragLeave(courtId){
+  const el = document.getElementById(`court-drop-${courtId}`);
+  if(el) el.classList.remove('drag-over-zone');
+}
+function courtDrop(e, courtId){
+  e.preventDefault();
+  const el = document.getElementById(`court-drop-${courtId}`);
+  if(el) el.classList.remove('drag-over-zone');
+  if(dragQueueIdx===null) return;
+  const court = S.courts.find(c=>c.id===courtId);
+  if(!court) return;
+  if(court.players.length>=4){toast('Court is full — drop into a specific slot or remove a player first','warning');return;}
+  const nextSlot = court.players.length;
+  dropPlayerToSlot(dragQueueIdx, courtId, nextSlot);
+  dragQueueIdx = null;
+}
+
+function dropPlayerToSlot(queueIdx, courtId, slotIdx){
+  const court = S.courts.find(c=>c.id===courtId);
+  if(!court) return;
+  if(slotIdx>3){toast('Invalid slot','warning');return;}
+
+  // Determine which queue based on court category
+  const court2 = S.courts.find(c=>c.id===courtId);
+  const cat2 = getCourtCategory(court2||{});
+  // Try category queue first, then the other
+  let srcQueue = getQueue(cat2);
+  if(queueIdx>=srcQueue.length){
+    // index might be into the other queue's combined list — find by rendered index
+    const altCat = cat2==='advanced'?'beginner':'advanced';
+    srcQueue = getQueue(altCat);
+  }
+  const [player] = srcQueue.splice(queueIdx,1);
+  // Clear W/L tag on assignment
+  delete player.matchResult;
+  delete player.finishOrder;
+
+  // If slot occupied → bump to queue front
+  if(court.players[slotIdx]){
+    const bumped = court.players[slotIdx];
+    S.queue.unshift(bumped);
+    toast(`⚠ ${bumped.name} moved back to queue`,'info');
+  }
+
+  // Place in slot (pad array if needed)
+  while(court.players.length<=slotIdx) court.players.push(null);
+  court.players[slotIdx] = player;
+  court.players = court.players.filter(Boolean);
+
+  // Set ready — user must click Start Match
+  court.status = court.players.length>=4?'ready':court.players.length>0?'ready':'empty';
+
+  render();
+  const slotName = ['Team A – Slot 1','Team A – Slot 2','Team B – Slot 1','Team B – Slot 2'][slotIdx]||`Slot ${slotIdx+1}`;
+  toast(`✅ ${player.name} → ${court.name} (${slotName})`,'success');
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// MANUAL ASSIGN
+// ────────────────────────────────────────────────────────────────────────────
+let manualAssignCourtId = null;
+let manualAssignSlot = null;
+
+function buildSlotOptions(excludeIds=[], courtId=null){
+  const court = courtId ? S.courts.find(c=>c.id===courtId) : null;
+  const cat = getCourtCategory(court||{});
+  const q = getQueue(cat);
+  const onCourtNames = new Set(S.courts.flatMap(c=>c.players.map(p=>p.name)));
+  const inQueueNames = new Set(q.map(p=>p.name));
+  const queuePlayers = q.map(p=>({...p,src:'queue'}));
+  const sittingOut = Object.values(S.roster)
+    .filter(p=>!onCourtNames.has(p.name)&&!inQueueNames.has(p.name)&&getPlayerCategory(p.skill)===cat)
+    .map(p=>({...p,src:'roster'}));
+  const all = [...queuePlayers,...sittingOut];
+
+  const blankOpt = '<option value="">— Select player —</option>';
+  const opts = all.filter(p=>!excludeIds.includes(p.id)).map(p=>{
+    const tag = p.matchResult ? ` [${p.matchResult}]` : '';
+    const src = p.src==='queue'?'Queue':'Sitting out';
+    return `<option value="${p.id}|${p.src}">${p.name} [${p.skill}]${tag} — ${src}</option>`;
+  }).join('');
+  return blankOpt + opts;
+}
+
+function getSlotSelections(){
+  return [0,1,2,3].map(i=>{
+    const sel = document.getElementById(`slot-sel-${i}`);
+    return sel ? sel.value : '';
+  });
+}
+
+function onSlotSelectChange(){
+  // Refresh options across all dropdowns to prevent duplicate selections
+  const vals = getSlotSelections();
+  // Collect selected player ids per slot
+  const selectedIds = vals.map(v=>v?v.split('|')[0]:'');
+
+  [0,1,2,3].forEach(i=>{
+    const sel = document.getElementById(`slot-sel-${i}`);
+    if(!sel) return;
+    const curVal = sel.value;
+    // Exclude ids selected in OTHER slots
+    const excludeIds = selectedIds.filter((_,j)=>j!==i && selectedIds[j]);
+    sel.innerHTML = buildSlotOptions(excludeIds);
+    // Restore current selection
+    if(curVal) sel.value = curVal;
+  });
+
+  // Update confirm button label
+  const allFilled = vals.every(v=>v && v!=='');
+  const btn = document.getElementById('assign-confirm-btn');
+  if(btn){
+    if(allFilled){
+      btn.textContent = '🏓 Start Match';
+      btn.className = 'btn btn-success';
+    } else {
+      btn.textContent = 'Assign Players';
+      btn.className = 'btn btn-primary';
+    }
+  }
+}
+
+function openManualAssign(courtId){
+  const court = S.courts.find(c=>c.id===courtId);
+  if(!court) return;
+  manualAssignCourtId = courtId;
+  manualAssignSlot = null;
+
+  document.getElementById('assign-court-label').textContent = `Assigning to: ${court.name}`;
+
+  // Populate each slot dropdown with current occupant pre-selected or blank
+  [0,1,2,3].forEach(i=>{
+    const sel = document.getElementById(`slot-sel-${i}`);
+    const cur = document.getElementById(`slot-current-${i}`);
+    if(!sel) return;
+    sel.innerHTML = buildSlotOptions([]);
+    // Pre-select current player in this slot if any
+    const occupant = court.players[i];
+    if(occupant){
+      // Try to find them in queue options
+      const matchOpt = Array.from(sel.options).find(o=>o.value.startsWith(occupant.id+'|')||o.text.startsWith(occupant.name+' '));
+      if(matchOpt) sel.value = matchOpt.value;
+      if(cur) cur.innerHTML = `<span style="color:var(--amber)">⚠ Currently: ${occupant.name}</span>`;
+    } else {
+      if(cur) cur.innerHTML = `<span style="color:var(--text3)">— empty slot —</span>`;
+    }
+  });
+
+  // Refresh to exclude duplicates, set button state
+  onSlotSelectChange();
+  document.getElementById('modal-assign').classList.add('open');
+}
+
+function selectAssignSlot(el, slot){
+  // legacy — no-op in new UI
+  manualAssignSlot = slot;
+}
+
+function confirmManualAssign(){
+  const court = S.courts.find(c=>c.id===manualAssignCourtId);
+  if(!court){closeModals();return;}
+
+  const vals = getSlotSelections();
+  const hasAny = vals.some(v=>v && v!=='');
+  if(!hasAny){toast('Select at least one player','warning');return;}
+
+  let assigned = 0;
+  // Track which queue indices we're removing so we don't double-remove
+  const toRemoveFromQueue = [];
+
+  vals.forEach((val,slotIdx)=>{
+    if(!val) return;
+    const [pid, src] = val.split('|');
+
+    let player = null;
+    if(src==='queue'){
+      const qIdx = S.queue.findIndex(p=>p.id===pid);
+      if(qIdx!==-1){
+        player = {...S.queue[qIdx]};
+        toRemoveFromQueue.push(pid);
+      }
+    } else {
+      const rp = Object.values(S.roster).find(p=>p.id===pid);
+      if(rp) player = {...rp, gamesPlayed:rp.gamesPlayed||0, wins:rp.wins||0};
+    }
+    if(!player) return;
+
+    delete player.matchResult;
+    delete player.finishOrder;
+
+    // If slot currently occupied by a DIFFERENT player → bump to queue
+    const existing = court.players[slotIdx];
+    if(existing && existing.id !== player.id){
+      S.queue.unshift(existing);
+    }
+
+    // Pad and assign
+    while(court.players.length<=slotIdx) court.players.push(null);
+    court.players[slotIdx] = player;
+    assigned++;
+  });
+
+  // Remove assigned queue players (in reverse to preserve indices)
+  toRemoveFromQueue.forEach(pid=>{
+    const idx = S.queue.findIndex(p=>p.id===pid);
+    if(idx!==-1) S.queue.splice(idx,1);
+  });
+
+  court.players = court.players.filter(Boolean);
+  court.status = court.players.length>=4?'playing':court.players.length>0?'ready':'empty';
+  if(court.status==='playing' && !S.courtTimers[manualAssignCourtId]) S.courtTimers[manualAssignCourtId]=0;
+
+  closeModals();
+  render();
+
+  const allFilled = vals.every(v=>v&&v!=='');
+  if(allFilled){
+    toast(`🏓 Match started on ${court.name}!`, 'success');
+  } else {
+    toast(`✅ ${assigned} player(s) assigned to ${court.name}`, 'success');
+  }
+}
+
+function removePlayerFromCourt(courtId, playerIdx){
+  const court = S.courts.find(c=>c.id===courtId);
+  if(!court) return;
+  const p = court.players[playerIdx];
+  if(!p) return;
+  const cat = getCourtCategory(court);
+  getQueue(cat).unshift(p);
+  court.players.splice(playerIdx, 1);
+  // If was playing and we remove a player, revert to ready
+  court.status = court.players.length>=4&&court.status==='playing'?'playing':court.players.length>0?'ready':'empty';
+  if(court.players.length===0) S.courtTimers[courtId]=0;
+  render();
+  toast(`${p.name} moved back to queue`);
+}
+
+function quickAdd(){
+  const inp = document.getElementById('q-inline-input');
+  if(!inp||!inp.value.trim()){openAddPlayerModal();return;}
+  const name = inp.value.trim();
+  const id = 'p'+S.nextPlayerId++;
+  const skill='A';
+  const player = {id,name,skill,gamesPlayed:0,wins:0,addedAt:Date.now()};
+  const cat = getPlayerCategory(skill);
+  getQueue(cat).push(player);
+  if(!S.roster[name]) S.roster[name]={...player};
+  inp.value='';
+  render();
+  toast(`✅ ${name} added to 🌱 Beginner queue`, 'success');
+}
+
+function confirmAddPlayerInline(){
+  confirmAddPlayer();
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// INIT
+// ────────────────────────────────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') closeModals();
+});
+
+initDate();
+loadFacilitator();
+loadAllTimeRoster();
+
+// Restore queues from previous session
+const restored = loadSessionQueues();
+render();
+if(restored){
+  const bLen = S.queues.beginner.length;
+  const aLen = S.queues.advanced.length;
+  // Show restore banner
+  setTimeout(()=>{
+    toast(`📋 Restored ${restored} player${restored>1?'s':''} from last session (${bLen} Beginner · ${aLen} Adv/Int)`,'info');
+  },400);
+}
+// Attach autocomplete to the modal player name input
+setTimeout(()=>{
+  const inp = document.getElementById('ap-name');
+  if(inp) attachAutocomplete(inp, null);
+},300);
+</script>
+</body>
+</html>
